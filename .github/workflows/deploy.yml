@@ -12,9 +12,10 @@
 #                  Nadie sube archivos a mano, nunca.
 #
 # Configuración necesaria, una sola vez:
-#   1) firebase init hosting:github   → crea el secret FIREBASE_SERVICE_ACCOUNT
-#   2) Poner el ID del proyecto en .firebaserc y en FIREBASE_PROJECT (abajo)
-#   3) Settings → Branches → Add rule → main
+#   1) firebase init hosting:github — ya hecho. Creó el secret
+#      FIREBASE_SERVICE_ACCOUNT_HOUSTON_LAB_ECAFD y un workflow propio que
+#      se eliminó: desplegaba dist/ sin construirlo antes.
+#   2) Settings → Branches → Add rule → main
 #        · Require a pull request before merging
 #        · Require status checks to pass → Verificar
 #      (activar recién cuando el contenido esté listo)
@@ -28,7 +29,7 @@ on:
     branches: [main]
 
 env:
-  FIREBASE_PROJECT: TU-PROYECTO-FIREBASE
+  FIREBASE_PROJECT: houston-lab-ecafd
 
 jobs:
   verificar:
@@ -70,7 +71,7 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_HOUSTON_LAB_ECAFD }}
           projectId: ${{ env.FIREBASE_PROJECT }}
           expires: 7d
 
@@ -93,6 +94,6 @@ jobs:
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_HOUSTON_LAB_ECAFD }}
           projectId: ${{ env.FIREBASE_PROJECT }}
           channelId: live

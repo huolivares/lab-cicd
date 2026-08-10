@@ -56,7 +56,8 @@ revisar(
 );
 
 // ── 3. Nada a medio terminar ──────────────────────────────────────────
-const pendientes = [...html.matchAll(/\b(TODO|FIXME|XXX|pendiente:)/gi)].map(m => m[1]);
+// Sin la bandera `i`: en español "todo" es una palabra corriente y daba falsos positivos.
+const pendientes = [...html.matchAll(/\b(TODO|FIXME|XXX|HACK)\b/g)].map(m => m[1]);
 revisar(
   'No quedan marcas de trabajo pendiente',
   pendientes.length === 0,
@@ -68,7 +69,11 @@ revisar(
 const LIMITE = 700;
 const largas = [];
 slides.forEach((s, i) => {
-  const texto = s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const texto = s
+    .replace(/<aside[\s\S]*?<\/aside>/g, ' ')   // las notas del presentador no se proyectan
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (texto.length > LIMITE) largas.push(`${i + 1} (${texto.length} caracteres)`);
 });
 revisar(
@@ -77,14 +82,28 @@ revisar(
   `demasiado texto en la slide ${largas.join(', ')}. Partirla en dos.`,
 );
 
-// ── 5. El marcador de versión sigue en su lugar ───────────────────────
+// ── 5. No hay demasiadas viñetas ──────────────────────────────────────
+// Es lo que mejor predice que una slide se corte en pantalla.
+const MAX_VINETAS = 7;
+const cargadas = [];
+slides.forEach((s, i) => {
+  const n = (s.match(/<li\b/g) || []).length;
+  if (n > MAX_VINETAS) cargadas.push(`${i + 1} (${n} viñetas)`);
+});
+revisar(
+  `Ninguna slide pasa de ${MAX_VINETAS} viñetas`,
+  cargadas.length === 0,
+  `demasiadas viñetas en la slide ${cargadas.join(', ')}. Partirla en dos.`,
+);
+
+// ── 6. El marcador de versión sigue en su lugar ───────────────────────
 revisar(
   'El marcador de versión está presente',
   html.includes('VERSION_PLACEHOLDER'),
   'falta VERSION_PLACEHOLDER. El pipeline no podrá marcar qué versión se publicó.',
 );
 
-// ── 6. El HTML está bien cerrado ──────────────────────────────────────
+// ── 7. El HTML está bien cerrado ──────────────────────────────────────
 const abre = (html.match(/<section\b/g) || []).length;
 const cierra = (html.match(/<\/section>/g) || []).length;
 revisar(

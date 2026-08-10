@@ -1,95 +1,642 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Integración y despliegue continuo</title>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>Integración y despliegue continuo</title>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+<style>
+:root {
+  --tinta:#0E1A2B; --ambar:#E8871A; --gris:#7A8794; --fondo:#F3F5F8;
+  --blanco:#FFF; --linea:rgba(14,26,43,.11); --ambar-soft:rgba(232,135,26,.12);
+}
+*{box-sizing:border-box}
+body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparent 25%),var(--fondo)}
+.reveal{font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--tinta);font-size:34px;background:transparent}
+.reveal .slides section{
+  text-align:left;padding:34px 54px;border-radius:28px;background:rgba(255,255,255,.96);
+  box-shadow:0 18px 55px rgba(14,26,43,.09);border:1px solid rgba(14,26,43,.06);overflow:hidden;
+}
+.reveal .slides section::before{content:"";position:absolute;left:0;top:0;width:9px;height:100%;background:var(--ambar)}
+.reveal .slides section:first-child{
+  text-align:center;display:flex!important;flex-direction:column;justify-content:center;align-items:center;
+  background:radial-gradient(circle at 78% 22%,rgba(232,135,26,.22),transparent 24%),linear-gradient(135deg,#0E1A2B,#14243A);
+  color:white;border:0;box-shadow:0 24px 80px rgba(14,26,43,.28);
+}
+.reveal .slides section:first-child h1,.reveal .slides section:first-child h2{color:white;border:0}
+.reveal .slides section:first-child .nota{color:rgba(255,255,255,.72)}
+.reveal h1,.reveal h2,.reveal h3{font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--tinta);text-transform:none;letter-spacing:-.035em;line-height:1.08;font-weight:800}
+.reveal h1{font-size:2.35em;max-width:950px;margin-bottom:.25em}
+.reveal h2{font-size:1.42em;display:block;border:0;padding:0 0 .42em;margin:0 0 .65em;position:relative}
+.reveal h2::after{content:"";position:absolute;left:0;bottom:0;width:62px;height:5px;border-radius:99px;background:var(--ambar)}
+.reveal .slides section:first-child h2::after,.reveal .slides section.chapter h2::after{display:block}
+.reveal ul,.reveal ol{display:block;margin-left:.85em}
+.reveal li{margin-bottom:.42em;line-height:1.28}
+.reveal li::marker{color:var(--ambar);font-weight:800}
+.reveal p{line-height:1.38}
+.reveal strong{font-weight:800}
+.reveal .nota{color:var(--gris);font-size:.70em}
+.reveal .destacado{
+  background:linear-gradient(90deg,var(--ambar-soft),rgba(243,245,248,.65));
+  border:1px solid rgba(232,135,26,.22);border-left:5px solid var(--ambar);border-radius:14px;
+  padding:.65em .9em;text-align:left;font-size:.80em;margin-top:.65em;box-shadow:0 8px 25px rgba(14,26,43,.045)
+}
+.reveal code{font-family:"SFMono-Regular",Consolas,ui-monospace,monospace}
+.reveal pre{width:100%;box-shadow:0 16px 35px rgba(14,26,43,.12);margin:.55em 0;font-size:.44em;border-radius:14px;overflow:hidden}
+.reveal pre code{padding:1em 1.15em;max-height:520px;border-radius:14px;line-height:1.35}
+.reveal .pie-codigo{font-size:.67em;color:var(--gris);margin-top:.45em}
+.reveal table{border-collapse:separate;border-spacing:0;width:100%;border-radius:16px;border:1px solid var(--linea);box-shadow:0 12px 30px rgba(14,26,43,.07);background:white;overflow:hidden}
+.reveal th{background:var(--tinta);color:white;font-weight:700}
+.reveal td,.reveal th{padding:.65em .75em;border-bottom:1px solid var(--linea);border-right:1px solid var(--linea)}
+.reveal tr:last-child td{border-bottom:0}.reveal td:last-child,.reveal th:last-child{border-right:0}
+.marca{position:fixed;bottom:16px;left:22px;z-index:40;font-family:Inter,"Segoe UI",system-ui,sans-serif;font-size:11px;color:var(--gris);letter-spacing:2.5px;text-transform:uppercase;font-weight:700}
+.marca b{color:var(--tinta);font-weight:900}
+.version{position:fixed;bottom:16px;right:22px;z-index:40;font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;color:var(--gris);background:rgba(255,255,255,.75);padding:4px 8px;border-radius:999px;border:1px solid var(--linea)}
+.reveal .slides section:not(:first-child) h2::before{
+  content:attr(data-kicker);display:block;font-size:.38em;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ambar);font-weight:900;margin-bottom:.55em
+}
+.reveal .slides section.chapter{background:var(--tinta);color:white;display:flex!important;flex-direction:column;justify-content:center;border:0}
+.reveal .slides section.chapter::before{width:14px}
+.reveal .slides section.chapter h2{color:white;font-size:1.9em}
+.reveal .slides section.chapter .nota{color:rgba(255,255,255,.66)}
+.reveal .slides section.chapter h2::after{width:90px;height:6px}
+.flow-row{display:flex;align-items:center;justify-content:center;gap:.28em;margin-top:1.2em;flex-wrap:wrap}
+.flow-row .destacado{margin:0;text-align:center;min-width:135px;padding:.7em .8em;background:white;box-shadow:0 10px 24px rgba(14,26,43,.08);border-left-width:4px;font-weight:750}
+.flow-row .arrow{color:var(--ambar);font-weight:900;font-size:1.05em}
+.reveal .slides section code{color:var(--tinta);background:rgba(232,135,26,.10);padding:.06em .25em;border-radius:5px}
+@media(max-width:1000px){.reveal{font-size:28px}.reveal .slides section{padding:28px 38px;border-radius:22px}}
+</style>
 
-  <style>
-    :root {
-      --tinta: #0E1A2B;
-      --ambar: #E8871A;
-      --gris:  #7A8794;
-      --fondo: #F3F5F8;
-    }
-    .reveal { font-family: Corbel, "Segoe UI", system-ui, sans-serif; color: var(--tinta); }
-    .reveal h1, .reveal h2, .reveal h3 {
-      font-family: "Franklin Gothic Medium", "Segoe UI Semibold", system-ui, sans-serif;
-      color: var(--tinta); text-transform: none; letter-spacing: 0;
-    }
-    .reveal h2 { border-bottom: 3px solid var(--ambar); padding-bottom: .25em; display: inline-block; }
-    .reveal ul { display: block; }
-    .reveal li { margin-bottom: .4em; }
-    .reveal li::marker { color: var(--ambar); }
-    .reveal .nota { color: var(--gris); font-size: .8em; }
-    .reveal .destacado {
-      background: var(--fondo); border-left: 6px solid var(--ambar);
-      padding: .6em 1em; text-align: left; font-size: .9em;
-    }
-    .reveal code { font-family: Consolas, ui-monospace, monospace; }
-    .marca {
-      position: fixed; bottom: 12px; left: 18px; z-index: 40;
-      font-family: Consolas, ui-monospace, monospace; font-size: 13px;
-      color: var(--gris); letter-spacing: 2px;
-    }
-    .marca b { color: var(--tinta); font-weight: 600; }
-    .version {
-      position: fixed; bottom: 12px; right: 18px; z-index: 40;
-      font-family: Consolas, ui-monospace, monospace; font-size: 13px; color: var(--gris);
-    }
-  </style>
 </head>
 <body>
 
-  <div class="marca"><b>HOUSTON</b> LAB</div>
-  <!-- El pipeline reemplaza el marcador de abajo por el hash del commit publicado. -->
-  <div class="version">VERSION_PLACEHOLDER</div>
+ <div class="marca"><b>HOUSTON</b> LAB</div>
+ <!-- El pipeline reemplaza el marcador de abajo por el hash del commit publicado. -->
+ <div class="version">VERSION_PLACEHOLDER</div>
 
-  <div class="reveal">
-    <div class="slides">
+ <div class="reveal">
+ <div class="slides">
 
-      <section>
-        <h1>Integración y despliegue continuo</h1>
-        <p class="nota">Sesión 1 — Fundamentos y criterio</p>
-        <p class="nota">Houston Lab SpA</p>
-      </section>
+ <!-- ═══════════ APERTURA ═══════════ -->
 
-      <section>
-        <h2>Esta presentación es el laboratorio</h2>
-        <ul>
-          <li>Vive en un repositorio de Git.</li>
-          <li>Se publica sola con un pipeline, sin que nadie suba archivos.</li>
-          <li>Abajo a la derecha está la <strong>versión publicada</strong>.</li>
-        </ul>
-        <p class="destacado">El viernes 21 ustedes van a modificar estas mismas slides,
-        romper la validación a propósito y ver el sistema decir que no.</p>
-      </section>
+ <section>
+ <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.18em;font-size:.52em;text-transform:uppercase;margin-bottom:1.5em;">Ingeniería de software · Sesión 01</div>
+ <h1>Integración y despliegue continuo</h1>
+ <p class="nota">Sesión 1 — Fundamentos y criterio</p>
+ <p class="nota">Houston Lab SpA</p>
+ </section>
 
-      <section>
-        <h2>Slide de prueba</h2>
-        <ul>
-          <li>Esta slide existe para verificar que el pipeline publica.</li>
-          <li>Se reemplaza por el contenido real de los ocho módulos.</li>
-        </ul>
-      </section>
+ <section>
+ <h2 data-kicker="Punto de partida">Una pregunta para empezar</h2>
+ <p style="font-size:1.3em; margin:1em 0;">¿Qué pasa si mañana <strong>no están</strong>
+ las dos personas que despliegan?</p>
+ <aside class="notes">
+ No responder. Dejar que hablen 2-3 minutos. Lo que digan es el resto de la sesión.
+ No sermonear: el procedimiento actual funcionó mientras el volumen fue menor.
+ </aside>
+ </section>
 
-    </div>
-  </div>
+ <section>
+ <h2 data-kicker="El problema">Lo que cuesta el despliegue manual</h2>
+ <ul>
+ <li>El avance del equipo depende de <strong>una agenda</strong>, no del código listo.</li>
+ <li>No queda registro de <strong>qué se publicó</strong> ni de qué se verificó antes.</li>
+ <li>Ante un incidente, reconstruir lo ocurrido depende de <strong>la memoria</strong>.</li>
+ </ul>
+ <p class="destacado">Esto no es un error del equipo. El procedimiento funcionó mientras
+ el volumen fue menor. El problema es que el proceso no creció con las aplicaciones.</p>
+ </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
-  <script>
-    Reveal.initialize({
-      hash: true,
-      slideNumber: 'c/t',
-      transition: 'fade',
-      plugins: [RevealHighlight, RevealNotes],
-    });
-  </script>
+ <section>
+ <h2 data-kicker="Caso real">45 minutos, 440 millones de dólares</h2>
+ <p>Knight Capital, 1 de agosto de 2012. Una firma que movía el 17% del volumen
+ de la bolsa de Nueva York.</p>
+ <ul>
+ <li>Despliegue manual a ocho servidores. En <strong>uno</strong> no se copió el código nuevo.</li>
+ <li>Ese servidor operó 45 minutos con una configuración incoherente.</li>
+ <li>Pérdida cercana a <strong>440 millones</strong>. La empresa no sobrevivió al año.</li>
+ </ul>
+ <p class="nota">No falló el código. Falló que un humano copiara archivos a mano.</p>
+ </section>
+
+ <!-- ═══════════ 1 · GIT APLICADO ═══════════ -->
+
+ <section class="chapter">
+ <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">01</div>
+ <h2>1 · Git aplicado</h2>
+ <p class="nota">Ramas, commits y por qué la rama principal no se toca.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">Ramas cortas</h2>
+ <ul>
+ <li>Una rama por cambio. Vive <strong>horas o días</strong>, no semanas.</li>
+ <li>Mientras más vieja la rama, más caro fusionarla.</li>
+ <li>Escribir directamente sobre la principal elimina el punto de control que necesitamos para integrar cambios de forma segura.</li>
+ </ul>
+ <p class="destacado">La rama principal es lo que está publicado. Se toca por una sola
+ puerta, y esa puerta es el pull request.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">Commits con propósito</h2>
+ <ul>
+ <li>Un commit = un cambio con sentido. No "avances" ni "arreglos varios".</li>
+ <li>El mensaje explica <strong>por qué</strong>, no qué: el qué ya está en el diff.</li>
+ <li>Sirve para revertir con precisión: se deshace un cambio, no una semana.</li>
+ </ul>
+ <p class="nota">El historial es la documentación que sí se mantiene actualizada.</p>
+ </section>
+
+ <!-- ═══════════ 2 · PULL REQUESTS ═══════════ -->
+
+ <section class="chapter">
+ <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">02</div>
+ <h2>2 · El pull request</h2>
+ <p class="nota">Punto de control y, sobre todo, el gancho de toda la automatización.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Pull request">Qué es realmente un pull request</h2>
+ <ul>
+ <li>Una <strong>propuesta</strong> de cambio, no un cambio.</li>
+ <li>Un lugar donde la conversación queda pegada al código.</li>
+ <li><strong>El momento en que una máquina puede opinar antes que una persona.</strong></li>
+ </ul>
+ <p class="destacado">Sin pull request no hay dónde enchufar la verificación automática.
+ Todo lo que viene después de esta slide existe porque existe el PR.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Pull request">Revisión entre pares</h2>
+ <ul>
+ <li>Se comentan <strong>líneas específicas</strong>, no se aprueba en bloque.</li>
+ <li>Revisar es leer el diff, no confiar en el título.</li>
+ <li>Efecto lateral que importa más que el técnico: <strong>el conocimiento deja de
+ estar en una sola cabeza</strong>.</li>
+ </ul>
+ </section>
+
+ <!-- ═══════════ 3 · CI Y CD ═══════════ -->
+
+ <section class="chapter">
+ <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">03</div>
+ <h2>3 · Integración y despliegue continuo</h2>
+ <p class="nota">Tres términos que se usan como sinónimos y no lo son.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="CI">Integración continua</h2>
+ <p>Cada cambio se integra y <strong>una máquina lo verifica</strong>, siempre igual,
+ sin que nadie se acuerde de hacerlo.</p>
+ <ul>
+ <li>Construye · ejecuta pruebas · revisa reglas del proyecto.</li>
+ <li>Deja evidencia automática: qué se verificó, cuándo y sobre qué código.</li>
+ </ul>
+ <p class="destacado">No requiere tocar los servidores de producción. Se puede adoptar
+ mañana sin cambiar nada del despliegue actual.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="CI / CD">Entrega vs. despliegue</h2>
+ <ul>
+ <li><strong>Entrega continua</strong> — cada cambio queda listo para publicar.
+ Publicar sigue siendo una decisión humana, pero de un clic.</li>
+ <li><strong>Despliegue continuo</strong> — si pasa las verificaciones, se publica solo.
+ Sin intervención.</li>
+ </ul>
+ <p class="nota">La diferencia no es técnica, es de confianza en las pruebas.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Criterio">Cuál adoptar primero acá</h2>
+ <p class="destacado" style="font-size:1.1em"><strong>Integración continua.</strong>
+ En ese orden y sin saltarse pasos.</p>
+ <ul>
+ <li>Da valor <strong>aunque el despliegue siga siendo manual</strong>.</li>
+ <li>No exige acceso a servidores, ni cambios en los contenedores, ni ambientes nuevos.</li>
+ <li>Construye lo único que hace posible automatizar el despliegue después:
+ <strong>pruebas en las que el equipo confíe</strong>.</li>
+ </ul>
+ </section>
+
+ <!-- ═══════════ 4 · ANATOMÍA ═══════════ -->
+
+ <section>
+ <h2 data-kicker="De extremo a extremo">El flujo completo</h2>
+ <div class="flow-row">
+ <div class="destacado">Rama</div><span class="arrow">→</span>
+ <div class="destacado">Pull request</div><span class="arrow">→</span>
+ <div class="destacado">Build + pruebas</div><span class="arrow">→</span>
+ <div class="destacado">Revisión</div><span class="arrow">→</span>
+ <div class="destacado">main</div><span class="arrow">→</span>
+ <div class="destacado">Deploy</div>
+ </div>
+ <p class="nota" style="text-align:center;margin-top:1.2em;">
+ El objetivo es que cada cambio recorra siempre el mismo camino.
+ </p>
+ </section>
+
+ <section class="chapter">
+ <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">04</div>
+ <h2>4 · Anatomía de un pipeline</h2>
+ <p class="nota">El modelo que vamos a utilizar para entender el recorrido de un cambio.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Pipeline">Un modelo de pipeline</h2>
+ <ol>
+ <li><strong>Construcción</strong> — el código se compila una vez.</li>
+ <li><strong>Pruebas</strong> — automáticas, siempre las mismas.</li>
+ <li><strong>Artefacto versionado</strong> — el resultado queda guardado y etiquetado.</li>
+ <li><strong>Publicación</strong> — se promueve ese artefacto, no se recompila.</li>
+ <li><strong>Verificación</strong> — se confirma que lo publicado responde.</li>
+ <li><strong>Reversión</strong> — volver a la versión anterior es un paso más, no una emergencia.</li>
+ </ol>
+ </section>
+
+
+ <section>
+ <h2 data-kicker="Pipeline">El pipeline es un archivo</h2>
+ <ul>
+ <li>Vive en el repositorio, junto al código: <code>.github/workflows/</code></li>
+ <li>Se versiona, se revisa y se discute <strong>como cualquier otro archivo</strong>.</li>
+ <li>Cambiar el proceso de despliegue pasa a ser un pull request.</li>
+ </ul>
+ <p class="destacado">Nadie configura nada haciendo clic en una consola.
+ Si no está en el archivo, no existe.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Pipeline">Cuándo se dispara</h2>
+ <pre><code class="language-yaml" data-trim data-noescape>
+name: Verificar y publicar
+
+on:
+ push:
+ branches: [main]
+ pull_request:
+ branches: [main]
+ </code></pre>
+ <p class="pie-codigo">Dos disparadores: cada propuesta de cambio, y cada cambio
+ que entra a la rama principal.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Pipeline">El trabajo de verificación</h2>
+ <pre><code class="language-yaml" data-trim data-noescape>
+jobs:
+ verificar:
+ runs-on: ubuntu-latest
+ steps:
+ - uses: actions/checkout@v4
+
+ - uses: actions/setup-node@v4
+ with:
+ node-version: '20'
+
+ - name: Construir
+ run: node build.mjs
+
+ - name: Validar
+ run: node test/validar.mjs
+ </code></pre>
+ <p class="pie-codigo">Máquina limpia, código, herramientas, construir, validar.
+ Si un paso falla, se detiene ahí.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Pipeline">Publicar solo cuando corresponde</h2>
+ <pre><code class="language-yaml" data-trim data-noescape>
+ publicar:
+ needs: verificar
+ if: github.event_name == 'push'
+ && github.ref == 'refs/heads/main'
+ runs-on: ubuntu-latest
+ steps:
+ - uses: actions/checkout@v4
+ - name: Construir
+ run: node build.mjs
+ - name: Desplegar
+ run: npx firebase deploy
+ </code></pre>
+ <p class="pie-codigo"><code>needs</code> obliga a que la verificación pase primero.
+ El <code>if</code> impide publicar desde una propuesta de cambio.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Seguridad">Las credenciales no van en el código</h2>
+ <pre><code class="language-yaml" data-trim data-noescape>
+ - name: Desplegar
+ uses: FirebaseExtended/action-hosting-deploy@v0
+ with:
+ firebaseServiceAccount: ${{ secrets.SERVICE_ACCOUNT }}
+ projectId: mi-proyecto
+ channelId: live
+ </code></pre>
+ <ul>
+ <li>El valor real vive en el repositorio como <strong>secret</strong>, cifrado.</li>
+ <li>No aparece en el archivo, ni en el historial, ni en los registros.</li>
+ </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Seguridad">Un pipeline no usa la cuenta de una persona</h2>
+ <ul>
+ <li>Usa una <strong>cuenta de servicio</strong>: una identidad de máquina,
+ con el mínimo de permisos.</li>
+ <li>Si alguien se va de la empresa, <strong>el despliegue no se cae</strong>.</li>
+ <li>Rotar esa credencial no obliga a tocar el código.</li>
+ </ul>
+ <p class="nota">Es el primer error que se comete al automatizar: usar el usuario
+ del que armó el pipeline.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Concepto">Esto no es un diagrama</h2>
+ <p>El material que están viendo vive en un repositorio y está preparado para recorrer
+ este mismo flujo de automatización.</p>
+ <p class="destacado">Abajo a la derecha está la <strong>versión publicada</strong>.
+ Ese número identifica exactamente qué código están viendo.</p>
+ <aside class="notes">
+ Explicar conceptualmente dónde vive el pipeline y cómo se relaciona con el repositorio.
+ Dejar la demostración operativa y la ejecución en vivo para la segunda sesión.
+ Cerrar con: "en la próxima sesión vamos a ejecutar y romper este flujo a propósito".
+ </aside>
+ </section>
+
+ <section>
+ <h2 data-kicker="Configuración">Cómo se deja funcionando</h2>
+ <p class="nota">Tres configuraciones, una sola vez. Sin esto, el pipeline avisa
+ pero no protege.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Seguridad">Permiso para publicar</h2>
+ <ul>
+ <li>Se crea una <strong>cuenta de servicio</strong> en el proveedor de hosting.</li>
+ <li>Se le da <strong>solo</strong> el permiso de publicar. Nada más.</li>
+ <li>Su credencial se guarda como secret del repositorio.</li>
+ </ul>
+ <p class="destacado">Es el momento en que alguien con autoridad autoriza,
+ una vez, que ese repositorio publique en ese destino.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Gobernanza">Proteger la rama principal</h2>
+ <pre><code class="language-text" data-trim>
+Settings → Branches → Add rule → main
+
+ [x] Require a pull request before merging
+ [x] Require status checks to pass
+ → verificar
+ </code></pre>
+ <p class="destacado">Sin esto, el pipeline solo <strong>informa</strong>.
+ Con esto, <strong>bloquea</strong>. Es la diferencia entre una sugerencia
+ y una regla.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Gobernanza">Quién puede proponer cambios</h2>
+ <ul>
+ <li>Los miembros del equipo se agregan como <strong>colaboradores</strong>
+ del repositorio.</li>
+ <li>Permiso de escritura: pueden crear ramas y abrir propuestas.</li>
+ <li><strong>No</strong> pueden publicar saltándose la verificación. Eso lo
+ impide la regla anterior.</li>
+ </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Resumen">Lo que acaban de ver</h2>
+ <ul>
+ <li>Un archivo que describe el proceso completo de despliegue.</li>
+ <li>Una identidad de máquina con permisos mínimos.</li>
+ <li>Una regla que impide publicar sin verificar.</li>
+ </ul>
+ <p class="destacado">Nada de esto es una herramienta cara ni un proyecto de meses.
+ Son tres archivos y dos casillas.</p>
+ </section>
+
+
+ <!-- ═══════════ 5 · CONTENEDORES ═══════════ -->
+
+ <section class="chapter">
+ <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">05</div>
+ <h2>5 · Contenedores y registro de imágenes</h2>
+ <p class="nota">Por qué el servidor de producción no debería compilar nada.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Contenedores">Compilar en producción</h2>
+ <ul>
+ <li>Consume <strong>la memoria y la CPU que necesitan las aplicaciones</strong> que están atendiendo.</li>
+ <li>El resultado depende del estado del servidor ese día: no es reproducible.</li>
+ <li>Si la compilación falla a medias, falla <strong>sobre el ambiente que está en uso</strong>.</li>
+ <li>No queda un artefacto al que volver.</li>
+ </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Contenedores">Construir una vez, promover</h2>
+ <ul>
+ <li>La imagen se construye <strong>una sola vez</strong>, en el pipeline.</li>
+ <li>Queda en un <strong>registro</strong>, etiquetada con su versión.</li>
+ <li>El servidor solo descarga y levanta. Nada más.</li>
+ <li>Revertir es levantar la etiqueta anterior: segundos, no una recompilación.</li>
+ </ul>
+ <p class="destacado">Lo que se probó y lo que se publica son <strong>exactamente el mismo
+ artefacto</strong>. Sin registro intermedio, eso no se puede garantizar.</p>
+ </section>
+
+ <!-- ═══════════ 6 · PRUEBAS Y REVERSIBILIDAD ═══════════ -->
+
+ <section class="chapter">
+ <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">06</div>
+ <h2>6 · Pruebas y reversibilidad</h2>
+ <p class="nota">Cómo validar cuando la infraestructura no da para un ambiente espejo.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Pruebas">Sin ambiente paralelo</h2>
+ <p>No hace falta un clon de producción para verificar lo que más se rompe:</p>
+ <ul>
+ <li>Que el proyecto <strong>compile</strong>.</li>
+ <li>Que la lógica de negocio crítica <strong>siga dando el mismo resultado</strong>.</li>
+ <li>Que la aplicación <strong>levante y responda</strong> en un contenedor efímero.</li>
+ <li>Que las reglas del proyecto se cumplan.</li>
+ </ul>
+ <p class="nota">Todo eso corre en la máquina del pipeline y se descarta después.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Pruebas">Pruebas donde hoy no hay ninguna</h2>
+ <ul>
+ <li>No se empieza por cobertura. Se empieza por <strong>el camino crítico</strong>:
+ lo que si falla, se nota en la caja.</li>
+ <li>Cada vez que aparece un error en producción, <strong>la prueba es lo primero
+ que se escribe</strong>. Así no vuelve.</li>
+ <li>Diez pruebas que el equipo confía valen más que doscientas que nadie mira.</li>
+ </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Alcance">La base de datos: un límite importante</h2>
+ <p class="destacado" style="font-size:1.05em">En esta etapa, <strong>no automatizamos</strong>
+ los cambios de esquema de base de datos.</p>
+ <ul>
+ <li>Si el esquema cambia, revertir el código <strong>no necesariamente revierte</strong> la base de datos:
+ en el mismo despliegue.</li>
+ <li>El código nuevo funciona con el esquema viejo. El viejo, con el nuevo.</li>
+ <li>Lo que sobra se elimina <strong>en un despliegue posterior</strong>, cuando ya no hay
+ a qué volver.</li>
+ </ul>
+ <p class="nota">Aplica igual aunque los cambios de base sigan siendo manuales.</p>
+ <aside class="notes">
+ Mantener esta sección breve. El objetivo es entender por qué la base de datos
+ queda fuera de esta primera automatización, no enseñar migraciones.
+ </aside>
+ </section>
+
+ <!-- ═══════════ 7 · HERRAMIENTAS ═══════════ -->
+
+ <section class="chapter">
+ <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">07</div>
+ <h2>7 · Comparativa de herramientas</h2>
+ <p class="nota">Evaluadas contra sus criterios, no en abstracto.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Decisión">Los criterios</h2>
+ <ul>
+ <li><strong>Infraestructura</strong> — qué exige montar y mantener.</li>
+ <li><strong>Costo</strong> — real, incluyendo el tiempo de quien lo administra.</li>
+ <li><strong>Curva de aprendizaje</strong> — cuánto demora el equipo en ser autónomo.</li>
+ <li><strong>Esfuerzo de migración</strong> — qué hay que mover de donde ya está.</li>
+ </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Decisión">Las tres alternativas</h2>
+ <table style="font-size:.62em">
+ <tr>
+ <th></th><th>GitHub Actions</th><th>GitLab CI/CD</th><th>Jenkins</th>
+ </tr>
+ <tr>
+ <td>Infraestructura</td><td>Ninguna</td><td>Ninguna si es SaaS</td>
+ <td>Servidor propio, siempre encendido</td>
+ </tr>
+ <tr>
+ <td>Costo</td><td>Minutos incluidos</td><td>Minutos incluidos</td>
+ <td>Licencia cero, mantención alta</td>
+ </tr>
+ <tr>
+ <td>Curva</td><td>Baja</td><td>Baja</td><td>Alta: plugins y complementos</td>
+ </tr>
+ <tr>
+ <td>Migración</td><td><strong>Nada: ya están en GitHub</strong></td>
+ <td>Mover todos los repositorios</td><td>Montar y configurar de cero</td>
+ </tr>
+ </table>
+ </section>
+
+ <section>
+ <h2 data-kicker="Decisión">Recomendación</h2>
+ <p class="destacado" style="font-size:1.15em"><strong>Para este contexto: GitHub Actions.</strong></p>
+ <ul>
+ <li>El código ya vive ahí: <strong>cero migración</strong> y el pipeline queda al lado
+ del pull request que lo dispara.</li>
+ <li>No hay servidor que mantener. Jenkins pediría infraestructura y alguien a cargo.</li>
+ <li>GitLab es igualmente válido, pero <strong>implicaría migrar</strong> y no aporta una ventaja que justifique ese costo.</li>
+ </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Adopción">Por dónde empezar</h2>
+ <p>Al automatizar varias aplicaciones, el orden no es por importancia. Es por <strong>riesgo bajo y aprendizaje alto</strong>:</p>
+ <ul>
+ <li>La que <strong>cambia más seguido</strong>: paga el esfuerzo antes.</li>
+ <li>La de <strong>menor impacto si falla</strong>: el equipo aprende sin costo.</li>
+ <li>La que <strong>menos toca la base de datos</strong>: menos aristas al principio.</li>
+ <li>La última: la más crítica, cuando el flujo ya es rutina.</li>
+ </ul>
+ </section>
+
+ <!-- ═══════════ 8 · MÉTRICAS ═══════════ -->
+
+ <section class="chapter">
+ <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">08</div>
+ <h2>8 · Cómo se mide todo esto</h2>
+ <ul>
+ <li><strong>Frecuencia de despliegue</strong> — cada cuánto llega algo a producción.</li>
+ <li><strong>Tiempo de entrega</strong> — desde que el código está listo hasta que está publicado.</li>
+ <li><strong>Tasa de fallos</strong> — qué porcentaje de despliegues causa un problema.</li>
+ <li><strong>Tiempo de recuperación</strong> — cuánto se demora en volver a estar bien.</li>
+ </ul>
+ <p class="destacado"><strong>Medir antes de automatizar.</strong> Es la única forma de
+ mostrar después que el cambio sirvió.</p>
+ <aside class="notes">
+ Pasar rápido por esta sección. Estas métricas sirven para evaluar el resultado
+ de la automatización; no son el objetivo principal de esta sesión.
+ </aside>
+ </section>
+
+ <!-- ═══════════ CIERRE ═══════════ -->
+
+ <section>
+ <h2 data-kicker="Siguiente paso">La próxima sesión: laboratorio</h2>
+ <p>Cada uno va a ejecutar el ciclo completo sobre este mismo repositorio.
+ Ningún ejercicio toca sus sistemas.</p>
+ <ul>
+ <li>Rama propia · primer pull request · verificación automática.</li>
+ <li><strong>Rechazo controlado</strong> — las pruebas fallan a propósito y el sistema
+ bloquea la fusión.</li>
+ <li>Revisión entre pares · fusión, despliegue y reversión.</li>
+ </ul>
+ <aside class="notes">
+ NO CERRAR SIN ESTO:
+ · pedir los nombres de usuario de GitHub de cada participante
+ · confirmar que asisten las mismas personas
+ · confirmar que todos llegan con Git instalado
+ </aside>
+ </section>
+
+ <section>
+ <h2 data-kicker="Siguiente paso">Para la próxima sesión</h2>
+ <ul>
+ <li>Su <strong>nombre de usuario de GitHub</strong> — los necesito con dos días hábiles
+ de anticipación para darles acceso.</li>
+ <li><strong>Git instalado</strong> en el computador con el que van a trabajar.</li>
+ <li>Las <strong>mismas personas</strong> de hoy.</li>
+ </ul>
+ <p class="nota">Houston Lab SpA · huolivares@gmail.com</p>
+ </section>
+
+ </div>
+ </div>
+
+ <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+ <script>
+ Reveal.initialize({
+ width: 1400,
+ height: 900,
+ margin: 0.045,
+ minScale: 0.2,
+ maxScale: 2.0,
+ hash: true,
+ slideNumber: 'c/t',
+ transition: 'fade',
+ transitionSpeed: 'fast',
+ backgroundTransition: 'fade',
+ controlsTutorial: false,
+ plugins: [RevealHighlight, RevealNotes],
+ });
+ </script>
 </body>
 </html>

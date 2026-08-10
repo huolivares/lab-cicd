@@ -6,7 +6,9 @@ Este repositorio es a la vez el material de la capacitación y el terreno de pr�
 La presentación que se proyecta en las sesiones vive acá y se publica sola con el
 pipeline. No hay nadie subiendo archivos a un servidor.
 
-**Presentación publicada:** _(completar con la URL de GitHub Pages)_
+**Presentación publicada:** https://houston-lab-ecafd.web.app
+
+Para verla en local: `node build.mjs && open dist/index.html`
 
 ---
 
@@ -58,16 +60,16 @@ tiene consecuencias, es el momento que mejor transmite el valor de automatizar.
 
 **Firebase**
 
-```bash
-npm install -g firebase-tools
-firebase login
-firebase init hosting:github
-```
+Ya está hecho. `firebase init hosting:github` creó la cuenta de servicio y guardó el
+secret `FIREBASE_SERVICE_ACCOUNT_HOUSTON_LAB_ECAFD` en el repositorio.
 
-Eso crea la cuenta de servicio y guarda el secret `FIREBASE_SERVICE_ACCOUNT` en el
-repositorio. Si ofrece sobrescribir el workflow, **decir que no**: el de este repo ya
-está escrito. Después, poner el ID del proyecto en `.firebaserc` y en la variable
-`FIREBASE_PROJECT` de `.github/workflows/deploy.yml`.
+El proyecto es `houston-lab-ecafd`, declarado en `.firebaserc` y en la variable
+`FIREBASE_PROJECT` del workflow.
+
+Nota: el CLI genera además su propio workflow (`firebase-hosting-pull-request.yml`).
+Se eliminó a propósito — desplegaba `dist/` **sin ejecutar el build antes**, así que
+habría publicado una carpeta vacía. El pipeline de este repo hace build, validación y
+despliegue en el orden correcto.
 
 **Protección de rama** — `Settings → Branches → Add rule → main`
 
