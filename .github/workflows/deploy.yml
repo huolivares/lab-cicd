@@ -1,4 +1,23 @@
 # Pipeline del laboratorio
+# =================================
+# Tres etapas, porque enseñan cosas distintas:
+#
+#   verificar      corre en CADA pull request y en cada push a main.
+#                  Si falla, GitHub bloquea la fusión. Es el "no" del sistema.
+#
+#   vista-previa   solo en pull requests. Publica el cambio en una URL temporal
+#                  y la comenta en el PR. El autor ve SU cambio antes de fusionar.
+#
+#   publicar       solo al fusionar en main. Va al sitio real.
+#                  Nadie sube archivos a mano, nunca.
+#
+# Configuración necesaria, una sola vez:
+#   1) firebase init hosting:github   → crea el secret FIREBASE_SERVICE_ACCOUNT
+#   2) Poner el ID del proyecto en .firebaserc y en FIREBASE_PROJECT (abajo)
+#   3) Settings → Branches → Add rule → main
+#        · Require a pull request before merging
+#        · Require status checks to pass → Verificar
+#      (activar recién cuando el contenido esté listo)
 
 name: Verificar y publicar
 
@@ -8,15 +27,8 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-# Si llegan dos cambios seguidos, se publica el último y se cancela el anterior.
-concurrency:
-  group: pages
-  cancel-in-progress: true
+env:
+  FIREBASE_PROJECT: TU-PROYECTO-FIREBASE
 
 jobs:
   verificar:
@@ -35,20 +47,52 @@ jobs:
       - name: Validar la presentación
         run: node test/validar.mjs
 
-      - name: Guardar el artefacto
-        uses: actions/upload-pages-artifact@v3
+  vista-previa:
+    name: Vista previa del cambio
+    needs: verificar
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
         with:
-          path: dist
+          node-version: '20'
+
+      - name: Construir
+        run: node build.mjs
+
+      - name: Publicar en una URL temporal
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ env.FIREBASE_PROJECT }}
+          expires: 7d
 
   publicar:
     name: Publicar
     needs: verificar
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}
     steps:
-      - name: Desplegar a GitHub Pages
-        id: deploy
-        uses: actions/deploy-pages@v4
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Construir
+        run: node build.mjs
+
+      - name: Publicar en el sitio real
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: ${{ env.FIREBASE_PROJECT }}
+          channelId: live
