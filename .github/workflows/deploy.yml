@@ -1,0 +1,54 @@
+# Pipeline del laboratorio
+
+name: Verificar y publicar
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Si llegan dos cambios seguidos, se publica el último y se cancela el anterior.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    name: Verificar
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Construir
+        run: node build.mjs
+
+      - name: Validar la presentación
+        run: node test/validar.mjs
+
+      - name: Guardar el artefacto
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  publicar:
+    name: Publicar
+    needs: verificar
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Desplegar a GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

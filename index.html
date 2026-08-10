@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Integración y despliegue continuo</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+
+  <style>
+    :root {
+      --tinta: #0E1A2B;
+      --ambar: #E8871A;
+      --gris:  #7A8794;
+      --fondo: #F3F5F8;
+    }
+    .reveal { font-family: Corbel, "Segoe UI", system-ui, sans-serif; color: var(--tinta); }
+    .reveal h1, .reveal h2, .reveal h3 {
+      font-family: "Franklin Gothic Medium", "Segoe UI Semibold", system-ui, sans-serif;
+      color: var(--tinta); text-transform: none; letter-spacing: 0;
+    }
+    .reveal h2 { border-bottom: 3px solid var(--ambar); padding-bottom: .25em; display: inline-block; }
+    .reveal ul { display: block; }
+    .reveal li { margin-bottom: .4em; }
+    .reveal li::marker { color: var(--ambar); }
+    .reveal .nota { color: var(--gris); font-size: .8em; }
+    .reveal .destacado {
+      background: var(--fondo); border-left: 6px solid var(--ambar);
+      padding: .6em 1em; text-align: left; font-size: .9em;
+    }
+    .reveal code { font-family: Consolas, ui-monospace, monospace; }
+    .marca {
+      position: fixed; bottom: 12px; left: 18px; z-index: 40;
+      font-family: Consolas, ui-monospace, monospace; font-size: 13px;
+      color: var(--gris); letter-spacing: 2px;
+    }
+    .marca b { color: var(--tinta); font-weight: 600; }
+    .version {
+      position: fixed; bottom: 12px; right: 18px; z-index: 40;
+      font-family: Consolas, ui-monospace, monospace; font-size: 13px; color: var(--gris);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="marca"><b>HOUSTON</b> LAB</div>
+  <!-- El pipeline reemplaza el marcador de abajo por el hash del commit publicado. -->
+  <div class="version">VERSION_PLACEHOLDER</div>
+
+  <div class="reveal">
+    <div class="slides">
+
+      <section>
+        <h1>Integración y despliegue continuo</h1>
+        <p class="nota">Sesión 1 — Fundamentos y criterio</p>
+        <p class="nota">Houston Lab SpA</p>
+      </section>
+
+      <section>
+        <h2>Esta presentación es el laboratorio</h2>
+        <ul>
+          <li>Vive en un repositorio de Git.</li>
+          <li>Se publica sola con un pipeline, sin que nadie suba archivos.</li>
+          <li>Abajo a la derecha está la <strong>versión publicada</strong>.</li>
+        </ul>
+        <p class="destacado">El viernes 21 ustedes van a modificar estas mismas slides,
+        romper la validación a propósito y ver el sistema decir que no.</p>
+      </section>
+
+      <section>
+        <h2>Slide de prueba</h2>
+        <ul>
+          <li>Esta slide existe para verificar que el pipeline publica.</li>
+          <li>Se reemplaza por el contenido real de los ocho módulos.</li>
+        </ul>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'fade',
+      plugins: [RevealHighlight, RevealNotes],
+    });
+  </script>
+</body>
+</html>
