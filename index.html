@@ -75,7 +75,10 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
 </head>
 <body>
 
- <div class="marca"><b>HOUSTON</b> LAB</div>
+ <div class="marca" style="display:inline-flex;align-items:center;gap:7px;">
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="13" height="13"><g fill="none" stroke="#0E1A2B" stroke-width="4" stroke-linecap="square"><path d="M4 13V4h9"/><path d="M27 4h9v9"/><path d="M36 27v9h-9"/><path d="M13 36H4v-9"/></g><circle cx="20" cy="20" r="6" fill="#0E1A2B"/></svg>
+ <span><b>HOUSTON</b> LAB</span>
+ </div>
  <!-- El pipeline reemplaza el marcador de abajo por el hash del commit publicado. -->
  <div class="version">VERSION_PLACEHOLDER</div>
 
@@ -85,6 +88,7 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <!-- ═══════════ APERTURA ═══════════ -->
 
  <section>
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="52" height="52" style="margin-bottom:.9em;"><g fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="square"><path d="M4 13V4h9"/><path d="M27 4h9v9"/><path d="M36 27v9h-9"/><path d="M13 36H4v-9"/></g><circle cx="20" cy="20" r="5.5" fill="#E8871A"/></svg>
  <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.18em;font-size:.52em;text-transform:uppercase;margin-bottom:1.5em;">Houston Lab</div>
  <h1>Integración y despliegue continuo</h1>
  <p class="nota">Sesión 1 — Fundamentos y criterio</p>
@@ -92,14 +96,9 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
 
  <!-- ═══════════ PRESENTACIÓN PERSONAL ═══════════ -->
 
- <section>
- <h2 data-kicker="Houston Lab">Hugo Olivares</h2>
- <ul>
- <li>Ingeniero en Informática. 17 años en desarrollo de software; más de la mitad
- liderando equipos técnicos.</li>
- <li>Certificaciones en DevOps, nube y liderazgo de equipos.</li>
- </ul>
- <p class="nota">linkedin.com/in/hugo-olivares-martínez-0a4a2431</p>
+ <section class="chapter">
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" style="margin-bottom:1em;"><g fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="square"><path d="M4 13V4h9"/><path d="M27 4h9v9"/><path d="M36 27v9h-9"/><path d="M13 36H4v-9"/></g><circle cx="20" cy="20" r="5.5" fill="#E8871A"/></svg>
+ <h2 data-kicker="Technical Lead">Hugo Olivares</h2>
  </section>
 
  <!-- ═══════════ DEVOPS COMO MARCO ═══════════ -->
@@ -107,9 +106,9 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <section>
  <h2 data-kicker="DevOps">El problema: dos objetivos que chocan</h2>
  <ul>
- <li>Quien desarrolla necesita <strong>publicar cambios seguido</strong>: nuevas funciones, correcciones.</li>
- <li>Quien opera necesita <strong>que el sistema no se caiga</strong>.</li>
- <li>Cuando son personas o equipos distintos, se forma una <strong>pared</strong> justo en el
+ <li class="fragment">Quien desarrolla necesita <strong>publicar cambios seguido</strong>: nuevas funciones, correcciones.</li>
+ <li class="fragment">Quien opera necesita <strong>que el sistema no se caiga</strong>.</li>
+ <li class="fragment">Cuando son personas o equipos distintos, se forma una <strong>pared</strong> justo en el
  momento de publicar: uno empuja, el otro frena.</li>
  </ul>
  <p class="nota">En la práctica esa pared se ve así: retrasos, aprobaciones manuales,
@@ -156,9 +155,9 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <section>
  <h2 data-kicker="El problema">Lo que cuesta el despliegue manual</h2>
  <ul>
- <li>El avance del equipo depende de <strong>una agenda</strong>, no del código listo.</li>
- <li>No queda registro de <strong>qué se publicó</strong> ni de qué se verificó antes.</li>
- <li>Ante un incidente, reconstruir lo ocurrido depende de <strong>la memoria</strong>.</li>
+ <li class="fragment">El avance del equipo depende de <strong>una agenda</strong>, no del código listo.</li>
+ <li class="fragment">No queda registro de <strong>qué se publicó</strong> ni de qué se verificó antes.</li>
+ <li class="fragment">Ante un incidente, reconstruir lo ocurrido depende de <strong>la memoria</strong>.</li>
  </ul>
  </section>
 
@@ -167,9 +166,9 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <p>Knight Capital, 1 de agosto de 2012. Una firma que movía el 17% del volumen
  de la bolsa de Nueva York.</p>
  <ul>
- <li>Despliegue manual a ocho servidores. En <strong>uno</strong> no se copió el código nuevo.</li>
- <li>Ese servidor operó 45 minutos con una configuración incoherente.</li>
- <li>Pérdida cercana a <strong>440 millones</strong>. La empresa no sobrevivió al año.</li>
+ <li class="fragment">Despliegue manual a ocho servidores. En <strong>uno</strong> no se copió el código nuevo.</li>
+ <li class="fragment">Ese servidor operó 45 minutos con una configuración incoherente.</li>
+ <li class="fragment">Pérdida cercana a <strong>440 millones</strong>. La empresa no sobrevivió al año.</li>
  </ul>
  <p class="nota">No falló el código. Falló que un humano copiara archivos a mano.</p>
  </section>
@@ -191,13 +190,29 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  </section>
 
  <section>
- <h2 data-kicker="Git">Ramas cortas (trunk-based)</h2>
+ <h2 data-kicker="Git">Estrategias de ramificación</h2>
+ <ul>
+ <li><strong>GitHub Flow (ramas cortas)</strong> — todo apunta a <code>main</code>,
+ se publica seguido.</li>
+ <li><strong>Gitflow</strong> — ramas <code>develop</code>/<code>release</code>/
+ <code>hotfix</code>, se publica por lotes.</li>
+ <li><strong>GitLab Flow</strong> — como GitHub Flow, con ramas de ambiente antes
+ de producción.</li>
+ </ul>
+ <p class="nota">Las tres resuelven el mismo problema — saber qué código está listo
+ para publicar — con distinto costo y distinta frecuencia.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">GitHub Flow (ramas cortas)</h2>
  <div class="flow-row">
  <div class="destacado">rama</div><span class="arrow">→</span>
  <div class="destacado">main</div>
  </div>
- <p class="nota" style="text-align:center;margin-top:1em;">Todo apunta directo a
- <code>main</code>. Ramas de horas o días, no semanas.</p>
+ <ul style="margin-top:1em;">
+ <li>Todo apunta directo a <code>main</code>. Ramas de horas o días, no semanas.</li>
+ <li>Cada rama se prueba y se publica por su cuenta, apenas está lista.</li>
+ </ul>
  </section>
 
  <section>
@@ -208,17 +223,36 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <div class="destacado">release/*</div><span class="arrow">→</span>
  <div class="destacado">main</div>
  </div>
- <p class="nota" style="text-align:center;margin-top:1em;"><code>hotfix/*</code> es la
- excepción: va directo a <code>main</code> y después se fusiona de vuelta a <code>develop</code>.</p>
+ <ul style="margin-top:1em;">
+ <li><code>hotfix/*</code> es la excepción: va directo a <code>main</code> y después
+ se fusiona de vuelta a <code>develop</code>.</li>
+ <li>Varios cambios se acumulan en <code>develop</code> antes de agruparse y salir juntos.</li>
+ </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">GitLab Flow</h2>
+ <div class="flow-row">
+ <div class="destacado">feature/*</div><span class="arrow">→</span>
+ <div class="destacado">main</div><span class="arrow">→</span>
+ <div class="destacado">pre-production</div><span class="arrow">→</span>
+ <div class="destacado">production</div>
+ </div>
+ <ul style="margin-top:1em;">
+ <li>Como GitHub Flow, pero agrega ramas por <strong>ambiente</strong> que se van
+ promoviendo una a una.</li>
+ <li>Sirve como paso intermedio cuando todavía no hay confianza para publicar
+ directo a producción.</li>
+ </ul>
  </section>
 
  <section>
  <h2 data-kicker="Git">Qué estrategia usar</h2>
  <ul>
- <li><strong>Ramas cortas</strong> conviene cuando publicar es frecuente y barato:
- cada cambio puede llegar a producción por su cuenta.</li>
- <li><strong>Gitflow</strong> conviene cuando publicar es <strong>por lotes</strong>:
- varias versiones que se agrupan y salen juntas en una fecha.</li>
+ <li><strong>GitHub Flow</strong> conviene cuando publicar es frecuente y barato.</li>
+ <li><strong>Gitflow</strong> conviene cuando publicar es por lotes, en fechas fijas.</li>
+ <li><strong>GitLab Flow</strong> conviene como paso intermedio, mientras se gana
+ confianza para publicar directo.</li>
  </ul>
  <p class="nota">No depende del lenguaje ni del framework — depende de con qué
  frecuencia y a qué costo se publica.</p>
@@ -246,6 +280,18 @@ git pull
  </code></pre>
  <p class="pie-codigo">Crear rama, marcar cambio, guardarlo, subirlo, traer lo nuevo.
  Con estos cinco alcanza para el trabajo diario.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">Comandos para revertir</h2>
+ <pre><code class="language-bash" data-trim>
+git log --oneline
+git revert &lt;hash&gt;
+git checkout -- archivo.js
+ </code></pre>
+ <p class="pie-codigo"><code>revert</code> es el que se usa en una rama compartida:
+ deshace un commit con uno nuevo, sin reescribir el historial. <code>checkout --</code>
+ descarta cambios que todavía no se han guardado.</p>
  </section>
 
  <section>
@@ -812,14 +858,14 @@ Settings → Branches → Add rule → main
  <section>
  <h2 data-kicker="Resumen">Todo el recorrido, junto</h2>
  <div class="flow-row">
- <div class="destacado">Rama</div><span class="arrow">→</span>
- <div class="destacado">Commit</div><span class="arrow">→</span>
- <div class="destacado">Pull request</div><span class="arrow">→</span>
- <div class="destacado">CI: build + pruebas</div><span class="arrow">→</span>
- <div class="destacado">Revisión</div><span class="arrow">→</span>
- <div class="destacado">main</div><span class="arrow">→</span>
- <div class="destacado">Imagen versionada</div><span class="arrow">→</span>
- <div class="destacado">Deploy</div>
+ <div class="destacado fragment">Rama</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">Commit</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">Pull request</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">CI: build + pruebas</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">Revisión</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">main</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">Imagen versionada</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">Deploy</div>
  </div>
  <p class="nota" style="text-align:center;margin-top:1.2em;">
  Esto es lo que vimos hoy: el camino de un cambio, de la rama a producción.
@@ -862,7 +908,8 @@ Settings → Branches → Add rule → main
  </ul>
  </section>
 
- <section>
+ <section class="chapter">
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" style="margin-bottom:1em;"><g fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="square"><path d="M4 13V4h9"/><path d="M27 4h9v9"/><path d="M36 27v9h-9"/><path d="M13 36H4v-9"/></g><circle cx="20" cy="20" r="5.5" fill="#E8871A"/></svg>
  <h2 data-kicker="Fin de la sesión">Gracias</h2>
  </section>
 
@@ -881,7 +928,7 @@ Settings → Branches → Add rule → main
  maxScale: 2.0,
  hash: true,
  slideNumber: 'c/t',
- transition: 'fade',
+ transition: 'slide',
  transitionSpeed: 'fast',
  backgroundTransition: 'fade',
  controlsTutorial: false,
