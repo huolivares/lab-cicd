@@ -68,6 +68,7 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
 .flow-row .destacado{margin:0;text-align:center;min-width:135px;padding:.7em .8em;background:white;box-shadow:0 10px 24px rgba(14,26,43,.08);border-left-width:4px;font-weight:750}
 .flow-row .arrow{color:var(--ambar);font-weight:900;font-size:1.05em}
 .reveal .slides section code{color:var(--tinta);background:rgba(232,135,26,.10);padding:.06em .25em;border-radius:5px}
+.reveal .slides section pre code{background:#272822;color:#ddd}
 @media(max-width:1000px){.reveal{font-size:28px}.reveal .slides section{padding:28px 38px;border-radius:22px}}
 </style>
 
@@ -92,11 +93,13 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <!-- ═══════════ PRESENTACIÓN PERSONAL ═══════════ -->
 
  <section>
- <h2 data-kicker="Technical Lead · Banco Ripley Chile">Hugo Olivares</h2>
+ <h2 data-kicker="Houston Lab">Hugo Olivares</h2>
  <ul>
- <li>17 años en desarrollo de software; más de la mitad liderando equipos técnicos.</li>
- <li>DevOps Foundation Certificate, DevOps Institute.</li>
+ <li>Ingeniero en Informática. 17 años en desarrollo de software; más de la mitad
+ liderando equipos técnicos.</li>
+ <li>Certificaciones en DevOps, nube y liderazgo de equipos.</li>
  </ul>
+ <p class="nota">linkedin.com/in/hugo-olivares-martínez-0a4a2431</p>
  </section>
 
  <!-- ═══════════ DEVOPS COMO MARCO ═══════════ -->
@@ -188,7 +191,41 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  </section>
 
  <section>
- <h2 data-kicker="Git">Ramas cortas</h2>
+ <h2 data-kicker="Git">Ramas cortas (trunk-based)</h2>
+ <div class="flow-row">
+ <div class="destacado">rama</div><span class="arrow">→</span>
+ <div class="destacado">main</div>
+ </div>
+ <p class="nota" style="text-align:center;margin-top:1em;">Todo apunta directo a
+ <code>main</code>. Ramas de horas o días, no semanas.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">Gitflow</h2>
+ <div class="flow-row">
+ <div class="destacado">feature/*</div><span class="arrow">→</span>
+ <div class="destacado">develop</div><span class="arrow">→</span>
+ <div class="destacado">release/*</div><span class="arrow">→</span>
+ <div class="destacado">main</div>
+ </div>
+ <p class="nota" style="text-align:center;margin-top:1em;"><code>hotfix/*</code> es la
+ excepción: va directo a <code>main</code> y después se fusiona de vuelta a <code>develop</code>.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">Qué estrategia usar</h2>
+ <ul>
+ <li><strong>Ramas cortas</strong> conviene cuando publicar es frecuente y barato:
+ cada cambio puede llegar a producción por su cuenta.</li>
+ <li><strong>Gitflow</strong> conviene cuando publicar es <strong>por lotes</strong>:
+ varias versiones que se agrupan y salen juntas en una fecha.</li>
+ </ul>
+ <p class="nota">No depende del lenguaje ni del framework — depende de con qué
+ frecuencia y a qué costo se publica.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">Ramas cortas, en la práctica</h2>
  <ul>
  <li>Una rama por cambio. Vive <strong>horas o días</strong>, no semanas.</li>
  <li>Mientras más vieja la rama, más caro fusionarla.</li>
@@ -199,16 +236,16 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  </section>
 
  <section>
- <h2 data-kicker="Git">Qué estrategia de ramas usar</h2>
- <ul>
- <li><strong>Ramas cortas (trunk-based)</strong> — todo apunta a <code>main</code>, ramas de
- horas o días. Conviene con despliegue web frecuente y buenas pruebas automáticas.</li>
- <li><strong>Gitflow</strong> — ramas <code>develop</code>, <code>release</code> y
- <code>hotfix</code> separadas de <code>main</code>. Pensado para software que se publica
- <strong>por lotes</strong> (apps de escritorio, apps móviles con revisión de tienda).</li>
- </ul>
- <p class="nota">Para este equipo, con despliegue web continuo: ramas cortas. Gitflow agrega
- pasos que solo se justifican cuando publicar es costoso o poco frecuente.</p>
+ <h2 data-kicker="Git">Comandos que van a usar seguido</h2>
+ <pre><code class="language-bash" data-trim>
+git checkout -b nombre-de-la-rama
+git add archivo.js
+git commit -m "mensaje"
+git push -u origin nombre-de-la-rama
+git pull
+ </code></pre>
+ <p class="pie-codigo">Crear rama, marcar cambio, guardarlo, subirlo, traer lo nuevo.
+ Con estos cinco alcanza para el trabajo diario.</p>
  </section>
 
  <section>
@@ -232,7 +269,8 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
 ✓ Agrega validación de RUT antes de guardar el formulario
  </code></pre>
  <p class="pie-codigo">El mensaje explica qué problema resuelve el cambio, no describe
- el archivo que se tocó.</p>
+ el archivo que se tocó. Mejor aún si queda enlazado a la tarea de origen: algunos
+ sistemas lo hacen automático, en otros se agrega una integración para lograrlo.</p>
  </section>
 
  <!-- ═══════════ 2 · PULL REQUESTS ═══════════ -->
@@ -250,7 +288,7 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <li>Un lugar donde la conversación queda pegada al código.</li>
  <li><strong>El momento en que una máquina puede opinar antes que una persona.</strong></li>
  </ul>
- <p class="destacado">Sin pull request no hay dónde enchufar la verificación automática.
+ <p class="destacado">Sin pull request no hay dónde conectar la verificación automática.
  Todo lo que viene después de esta slide existe porque existe el PR.</p>
  </section>
 
@@ -317,6 +355,20 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  </ul>
  </section>
 
+ <section>
+ <h2 data-kicker="Criterio">¿Y si no se puede publicar en cada cambio?</h2>
+ <ul>
+ <li>La integración continua corre igual en cada cambio — eso no depende de con qué
+ frecuencia se publique.</li>
+ <li>Publicar sí se puede agrupar: una rama de <strong>release</strong> junta varios
+ cambios ya integrados y probados, y sale en una fecha fija (cada dos semanas, por ejemplo).</li>
+ <li>Es la misma idea de Gitflow que ya vimos: <code>develop</code> acumula,
+ <code>release</code> agrupa, <code>main</code> publica.</li>
+ </ul>
+ <p class="nota">Automatizar no obliga a publicar seguido. Obliga a que, cuando se
+ publique, sea siempre de la misma forma y ya esté probado.</p>
+ </section>
+
  <!-- ═══════════ 4 · ANATOMÍA ═══════════ -->
 
  <section>
@@ -366,15 +418,18 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
 
  <section>
  <h2 data-kicker="Pipeline">Pruebas según el lenguaje</h2>
- <table style="font-size:.62em">
+ <table style="font-size:.58em">
  <tr><th>Lenguaje</th><th>Comando de prueba</th></tr>
  <tr><td>.NET</td><td><code>dotnet test</code></td></tr>
  <tr><td>Node / TypeScript</td><td><code>npm test</code></td></tr>
  <tr><td>Python</td><td><code>pytest</code></td></tr>
  <tr><td>Java</td><td><code>mvn test</code></td></tr>
+ <tr><td>PHP</td><td><code>phpunit</code></td></tr>
+ <tr><td>Go</td><td><code>go test ./...</code></td></tr>
  </table>
- <p class="nota">El comando del paso "Validar" cambia según el proyecto; la idea — compilar
- y probar en una máquina limpia, siempre igual — es la misma para todos.</p>
+ <p class="nota">El comando cambia según el proyecto — y también dónde corre, según el
+ framework. La idea (compilar y probar en una máquina limpia, siempre igual) es la
+ misma para todos.</p>
  </section>
 
  <section>
@@ -493,9 +548,10 @@ jobs:
  <h2 data-kicker="Concepto">Este pipeline es real, no un ejemplo</h2>
  <p>Esta misma presentación vive en un repositorio de Git y se publica con exactamente
  el pipeline que acaban de ver: build, validación y despliegue automáticos.</p>
- <p class="destacado">El número abajo a la derecha es el <strong>hash del commit</strong>
- publicado — lo genera el pipeline en cada build. No está escrito como texto en ningún
- archivo del repositorio, por eso no se busca en el código.</p>
+ <p class="destacado">El número abajo a la derecha es el <strong>hash del commit de
+ <code>main</code></strong> que está publicado ahora mismo — lo genera el pipeline en
+ cada build. Se puede comprobar: es el mismo hash que figura como último commit de
+ <code>main</code> en GitHub.</p>
  <aside class="notes">
  Explicar conceptualmente dónde vive el pipeline y cómo se relaciona con el repositorio.
  Dejar la demostración operativa y la ejecución en vivo para la segunda sesión.
@@ -504,9 +560,10 @@ jobs:
  </section>
 
  <section>
- <h2 data-kicker="Configuración">Cómo se deja funcionando</h2>
- <p class="nota">Tres configuraciones que se hacen una sola vez. Sin ellas, el pipeline
- puede correr y marcar error en rojo, pero nada impide que igual se fusione o se publique.</p>
+ <h2 data-kicker="Configuración">Lo que hay que activar aparte del código</h2>
+ <p class="nota">El archivo del pipeline no alcanza solo. Faltan tres configuraciones del
+ repositorio, una sola vez: sin ellas, el pipeline corre y marca error en rojo, pero nada
+ impide que igual se fusione o se publique.</p>
  </section>
 
  <section>
@@ -547,14 +604,13 @@ Settings → Branches → Add rule → main
  </section>
 
  <section>
- <h2 data-kicker="Resumen">Lo que acaban de ver</h2>
+ <h2 data-kicker="Resumen">Con qué queda configurado el repositorio</h2>
  <ul>
  <li>Un archivo que describe el proceso completo de despliegue.</li>
  <li>Una identidad de máquina con permisos mínimos.</li>
- <li>Una regla que impide publicar sin verificar.</li>
+ <li>Una regla activada con dos casillas: <strong>requerir pull request</strong> y
+ <strong>requerir que la verificación pase</strong> antes de fusionar.</li>
  </ul>
- <p class="destacado">Nada de esto es una herramienta cara ni un proyecto de meses.
- Son tres archivos y dos casillas.</p>
  </section>
 
 
@@ -622,15 +678,13 @@ Settings → Branches → Add rule → main
  </section>
 
  <section>
- <h2 data-kicker="Alcance">La base de datos: un límite importante</h2>
- <p class="destacado" style="font-size:1.05em">El esquema de base de datos es un límite que
- <strong>cada equipo cruza cuando está listo</strong>, no algo que se decide hoy.</p>
+ <h2 data-kicker="Alcance">La base de datos no se revierte con el código</h2>
+ <p>Si revierten una versión, el código vuelve atrás. La base de datos no — sus datos y
+ su estructura se quedan como están.</p>
  <ul>
- <li>Si el esquema cambia, revertir el código <strong>no necesariamente revierte</strong> la base de datos:
- en el mismo despliegue.</li>
- <li>El código nuevo funciona con el esquema viejo. El viejo, con el nuevo.</li>
- <li>Lo que sobra se elimina <strong>en un despliegue posterior</strong>, cuando ya no hay
- a qué volver.</li>
+ <li>Por eso, cuando el código nuevo cambia el esquema, tiene que poder funcionar
+ <strong>también</strong> con el esquema viejo, al menos por un tiempo.</li>
+ <li>Recién cuando ya no hace falta volver atrás, se limpia lo que sobra.</li>
  </ul>
  <p class="nota">Aplica igual aunque los cambios de base sigan siendo manuales.</p>
  <aside class="notes">
@@ -685,19 +739,17 @@ Settings → Branches → Add rule → main
  <tr>
  <td>Curva</td><td>Baja</td><td>Baja</td><td>Alta: plugins y complementos</td>
  </tr>
- <tr>
- <td>Migración</td><td><strong>Nada: ya están en GitHub</strong></td>
- <td>Mover todos los repositorios</td><td>Montar y configurar de cero</td>
- </tr>
  </table>
  </section>
 
  <section>
- <h2 data-kicker="Decisión">Si ya están en una nube</h2>
+ <h2 data-kicker="Decisión">Otras opciones frecuentes</h2>
  <ul>
  <li><strong>AWS</strong> — CodePipeline / CodeBuild.</li>
  <li><strong>Azure</strong> — Azure Pipelines.</li>
  <li><strong>Google Cloud</strong> — Cloud Build.</li>
+ <li><strong>Bitbucket</strong> — Bitbucket Pipelines. <strong>CircleCI</strong> —
+ independiente de dónde viva el código.</li>
  </ul>
  <p class="nota">El criterio no cambia: conviene la herramienta que ya vive donde vive
  el código y el resto de la infraestructura, no la que tiene más funciones.</p>
@@ -708,10 +760,11 @@ Settings → Branches → Add rule → main
  <p class="destacado" style="font-size:1.1em"><strong>La opción por defecto: la herramienta
  de donde ya vive el código.</strong></p>
  <ul>
- <li>En GitHub → GitHub Actions. En GitLab → GitLab CI/CD. En una nube → su pipeline nativo.</li>
+ <li>En GitHub → GitHub Actions. En GitLab → GitLab CI/CD. En Bitbucket → Bitbucket
+ Pipelines. En una nube → su pipeline nativo.</li>
  <li>Cero migración, cero infraestructura nueva que mantener.</li>
- <li>Jenkins u otra opción autoalojada solo se justifica cuando hay una razón concreta
- para no depender de ningún proveedor.</li>
+ <li>Jenkins u otra opción autoalojada se justifica con una razón concreta: por
+ ejemplo, una política de seguridad que exige que el código nunca salga de la red interna.</li>
  </ul>
  </section>
 
@@ -730,7 +783,7 @@ Settings → Branches → Add rule → main
 
  <section class="chapter">
  <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">08</div>
- <h2>8 · Cómo se mide todo esto (DORA)</h2>
+ <h2>8 · Cómo se mide todo esto</h2>
  <ul>
  <li><strong>Frecuencia de despliegue</strong> — cada cuánto llega algo a producción.</li>
  <li><strong>Tiempo de entrega</strong> — desde que el código está listo hasta que está publicado.</li>
@@ -746,11 +799,12 @@ Settings → Branches → Add rule → main
  </section>
 
  <section>
- <h2 data-kicker="Métricas">De dónde salen estas cuatro</h2>
- <p><strong>DORA</strong> (DevOps Research and Assessment) es el estudio que, tras comparar
- miles de equipos de software durante más de una década, identificó estas cuatro métricas
- como las que mejor predicen qué tan bien le va a un equipo.</p>
- <p class="nota">No son una opinión de esta capacitación: son el resultado de datos.</p>
+ <h2 data-kicker="Métricas">Por qué estas cuatro</h2>
+ <p>No son las únicas posibles, pero son las que más se repiten en la industria del
+ software para responder una pregunta simple: <strong>¿esto realmente mejoró la forma
+ en que publicamos?</strong></p>
+ <p class="nota">Dos miden velocidad (frecuencia, tiempo de entrega). Dos miden
+ estabilidad (fallos, recuperación). Un equipo sano mejora en las cuatro a la vez.</p>
  </section>
 
  <!-- ═══════════ CIERRE ═══════════ -->
@@ -773,13 +827,13 @@ Settings → Branches → Add rule → main
  </section>
 
  <section>
- <h2 data-kicker="Para seguir creciendo">DevOps es más que este pipeline</h2>
+ <h2 data-kicker="Para seguir creciendo">Por acá se suele empezar</h2>
  <ul>
- <li>Hoy vimos <strong>integración y despliegue continuo</strong>: una parte central,
- pero una parte.</li>
- <li>Quedan fuera, por ahora: <strong>monitoreo</strong>, gestión de incidentes,
- infraestructura como código, observabilidad.</li>
- <li>Cada una de esas piezas se puede sumar cuando el equipo esté listo.</li>
+ <li>Integración y despliegue continuo es, en la práctica, <strong>la puerta de
+ entrada</strong> a DevOps: es lo que más rápido se implementa y lo que más se nota.</li>
+ <li>Una vez que este flujo existe, el resto — <strong>monitoreo, observabilidad,
+ infraestructura como código</strong> — se apoya en él en vez de partir de cero.</li>
+ <li>Cada pieza nueva se suma sobre esta base, no en paralelo a ella.</li>
  </ul>
  </section>
 
@@ -810,7 +864,6 @@ Settings → Branches → Add rule → main
 
  <section>
  <h2 data-kicker="Fin de la sesión">Gracias</h2>
- <p class="nota">Preguntas, dudas o comentarios: huolivares@gmail.com</p>
  </section>
 
  </div>
