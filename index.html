@@ -68,13 +68,17 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
 .flow-row .destacado{margin:0;text-align:center;min-width:135px;padding:.7em .8em;background:white;box-shadow:0 10px 24px rgba(14,26,43,.08);border-left-width:4px;font-weight:750}
 .flow-row .arrow{color:var(--ambar);font-weight:900;font-size:1.05em}
 .reveal .slides section code{color:var(--tinta);background:rgba(232,135,26,.10);padding:.06em .25em;border-radius:5px}
+.reveal .slides section pre code{background:#272822;color:#ddd}
 @media(max-width:1000px){.reveal{font-size:28px}.reveal .slides section{padding:28px 38px;border-radius:22px}}
 </style>
 
 </head>
 <body>
 
- <div class="marca"><b>HOUSTON</b> LAB</div>
+ <div class="marca" style="display:inline-flex;align-items:center;gap:7px;">
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="13" height="13"><g fill="none" stroke="#0E1A2B" stroke-width="4" stroke-linecap="square"><path d="M4 13V4h9"/><path d="M27 4h9v9"/><path d="M36 27v9h-9"/><path d="M13 36H4v-9"/></g><circle cx="20" cy="20" r="6" fill="#0E1A2B"/></svg>
+ <span><b>HOUSTON</b> LAB</span>
+ </div>
  <!-- El pipeline reemplaza el marcador de abajo por el hash del commit publicado. -->
  <div class="version">VERSION_PLACEHOLDER</div>
 
@@ -84,36 +88,31 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <!-- ═══════════ APERTURA ═══════════ -->
 
  <section>
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.18em;font-size:.52em;text-transform:uppercase;margin-bottom:1.5em;">Ingeniería de software · Sesión 01</div>
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="52" height="52" style="margin-bottom:.9em;"><g fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="square"><path d="M4 13V4h9"/><path d="M27 4h9v9"/><path d="M36 27v9h-9"/><path d="M13 36H4v-9"/></g><circle cx="20" cy="20" r="5.5" fill="#E8871A"/></svg>
+ <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.18em;font-size:.52em;text-transform:uppercase;margin-bottom:1.5em;">Houston Lab</div>
  <h1>Integración y despliegue continuo</h1>
  <p class="nota">Sesión 1 — Fundamentos y criterio</p>
- <p class="nota">Houston Lab SpA</p>
  </section>
 
  <!-- ═══════════ PRESENTACIÓN PERSONAL ═══════════ -->
 
- <section>
- <h2 data-kicker="Quién dicta esta capacitación">Hugo Olivares</h2>
- <p class="nota">Houston Lab</p>
- <ul>
- <li>17 años en desarrollo de software; más de la mitad liderando equipos técnicos.</li>
- <li>Certificación en DevOps.</li>
- </ul>
- <p class="destacado">Al terminar la segunda sesión, van a publicar un cambio a
- producción con sus propias manos, sin pedirle permiso a nadie.</p>
+ <section class="chapter">
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" style="margin-bottom:1em;"><g fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="square"><path d="M4 13V4h9"/><path d="M27 4h9v9"/><path d="M36 27v9h-9"/><path d="M13 36H4v-9"/></g><circle cx="20" cy="20" r="5.5" fill="#E8871A"/></svg>
+ <h2 data-kicker="Technical Lead">Hugo Olivares</h2>
  </section>
 
  <!-- ═══════════ DEVOPS COMO MARCO ═══════════ -->
 
  <section>
- <h2 data-kicker="DevOps">La pared entre escribir y publicar</h2>
+ <h2 data-kicker="DevOps">El problema: dos objetivos que chocan</h2>
  <ul>
- <li>Quien escribe el código quiere <strong>cambiar rápido</strong>: agregar, corregir, mejorar.</li>
- <li>Quien pone ese código en producción quiere <strong>que nada deje de funcionar</strong>.</li>
- <li>Los dos objetivos son razonables. Chocan en el mismo punto: <strong>el momento de publicar</strong>.</li>
+ <li class="fragment">Quien desarrolla necesita <strong>publicar cambios seguido</strong>: nuevas funciones, correcciones.</li>
+ <li class="fragment">Quien opera necesita <strong>que el sistema no se caiga</strong>.</li>
+ <li class="fragment">Cuando son personas o equipos distintos, se forma una <strong>pared</strong> justo en el
+ momento de publicar: uno empuja, el otro frena.</li>
  </ul>
- <p class="nota">Esa pared no es un edificio ni un departamento: es la distancia entre
- escribir un cambio y verlo funcionando para alguien más.</p>
+ <p class="nota">En la práctica esa pared se ve así: retrasos, aprobaciones manuales,
+ despliegues que nadie quiere hacer un viernes.</p>
  </section>
 
  <section>
@@ -146,7 +145,7 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <section>
  <h2 data-kicker="Punto de partida">Una pregunta para empezar</h2>
  <p style="font-size:1.3em; margin:1em 0;">¿Qué pasa si mañana <strong>no están</strong>
- las dos personas que despliegan?</p>
+ las personas que despliegan?</p>
  <aside class="notes">
  No responder. Dejar que hablen 2-3 minutos. Lo que digan es el resto de la sesión.
  No sermonear: el procedimiento actual funcionó mientras el volumen fue menor.
@@ -156,12 +155,10 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <section>
  <h2 data-kicker="El problema">Lo que cuesta el despliegue manual</h2>
  <ul>
- <li>El avance del equipo depende de <strong>una agenda</strong>, no del código listo.</li>
- <li>No queda registro de <strong>qué se publicó</strong> ni de qué se verificó antes.</li>
- <li>Ante un incidente, reconstruir lo ocurrido depende de <strong>la memoria</strong>.</li>
+ <li class="fragment">El avance del equipo depende de <strong>una agenda</strong>, no del código listo.</li>
+ <li class="fragment">No queda registro de <strong>qué se publicó</strong> ni de qué se verificó antes.</li>
+ <li class="fragment">Ante un incidente, reconstruir lo ocurrido depende de <strong>la memoria</strong>.</li>
  </ul>
- <p class="destacado">Esto no es un error del equipo. El procedimiento funcionó mientras
- el volumen fue menor. El problema es que el proceso no creció con las aplicaciones.</p>
  </section>
 
  <section>
@@ -169,11 +166,19 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <p>Knight Capital, 1 de agosto de 2012. Una firma que movía el 17% del volumen
  de la bolsa de Nueva York.</p>
  <ul>
- <li>Despliegue manual a ocho servidores. En <strong>uno</strong> no se copió el código nuevo.</li>
- <li>Ese servidor operó 45 minutos con una configuración incoherente.</li>
- <li>Pérdida cercana a <strong>440 millones</strong>. La empresa no sobrevivió al año.</li>
+ <li class="fragment">Despliegue manual a ocho servidores. En <strong>uno</strong> no se copió el código nuevo.</li>
+ <li class="fragment">Ese servidor operó 45 minutos con una configuración incoherente.</li>
+ <li class="fragment">Pérdida cercana a <strong>440 millones</strong>. La empresa no sobrevivió al año.</li>
  </ul>
  <p class="nota">No falló el código. Falló que un humano copiara archivos a mano.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="De la falla a la disciplina">Lo que hubiera cambiado la historia</h2>
+ <p>Knight Capital no falló por un error de código: falló porque nadie tenía un registro
+ confiable de qué versión estaba corriendo en cada servidor.</p>
+ <p class="destacado">Todo lo que viene ahora — ramas, commits, pull requests — existe para que
+ siempre se sepa <strong>qué código hay en cada lugar</strong>, sin depender de la memoria de nadie.</p>
  </section>
 
  <!-- ═══════════ 1 · GIT APLICADO ═══════════ -->
@@ -185,7 +190,76 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  </section>
 
  <section>
- <h2 data-kicker="Git">Ramas cortas</h2>
+ <h2 data-kicker="Git">Estrategias de ramificación</h2>
+ <ul>
+ <li><strong>GitHub Flow (ramas cortas)</strong> — todo apunta a <code>main</code>,
+ se publica seguido.</li>
+ <li><strong>Gitflow</strong> — ramas <code>develop</code>/<code>release</code>/
+ <code>hotfix</code>, se publica por lotes.</li>
+ <li><strong>GitLab Flow</strong> — como GitHub Flow, con ramas de ambiente antes
+ de producción.</li>
+ </ul>
+ <p class="nota">Las tres resuelven el mismo problema — saber qué código está listo
+ para publicar — con distinto costo y distinta frecuencia.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">GitHub Flow (ramas cortas)</h2>
+ <div class="flow-row">
+ <div class="destacado">rama</div><span class="arrow">→</span>
+ <div class="destacado">main</div>
+ </div>
+ <ul style="margin-top:1em;">
+ <li>Todo apunta directo a <code>main</code>. Ramas de horas o días, no semanas.</li>
+ <li>Cada rama se prueba y se publica por su cuenta, apenas está lista.</li>
+ </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">Gitflow</h2>
+ <div class="flow-row">
+ <div class="destacado">feature/*</div><span class="arrow">→</span>
+ <div class="destacado">develop</div><span class="arrow">→</span>
+ <div class="destacado">release/*</div><span class="arrow">→</span>
+ <div class="destacado">main</div>
+ </div>
+ <ul style="margin-top:1em;">
+ <li><code>hotfix/*</code> es la excepción: va directo a <code>main</code> y después
+ se fusiona de vuelta a <code>develop</code>.</li>
+ <li>Varios cambios se acumulan en <code>develop</code> antes de agruparse y salir juntos.</li>
+ </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">GitLab Flow</h2>
+ <div class="flow-row">
+ <div class="destacado">feature/*</div><span class="arrow">→</span>
+ <div class="destacado">main</div><span class="arrow">→</span>
+ <div class="destacado">pre-production</div><span class="arrow">→</span>
+ <div class="destacado">production</div>
+ </div>
+ <ul style="margin-top:1em;">
+ <li>Como GitHub Flow, pero agrega ramas por <strong>ambiente</strong> que se van
+ promoviendo una a una.</li>
+ <li>Sirve como paso intermedio cuando todavía no hay confianza para publicar
+ directo a producción.</li>
+ </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">Qué estrategia usar</h2>
+ <ul>
+ <li><strong>GitHub Flow</strong> conviene cuando publicar es frecuente y barato.</li>
+ <li><strong>Gitflow</strong> conviene cuando publicar es por lotes, en fechas fijas.</li>
+ <li><strong>GitLab Flow</strong> conviene como paso intermedio, mientras se gana
+ confianza para publicar directo.</li>
+ </ul>
+ <p class="nota">No depende del lenguaje ni del framework — depende de con qué
+ frecuencia y a qué costo se publica.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">Ramas cortas, en la práctica</h2>
  <ul>
  <li>Una rama por cambio. Vive <strong>horas o días</strong>, no semanas.</li>
  <li>Mientras más vieja la rama, más caro fusionarla.</li>
@@ -196,6 +270,31 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  </section>
 
  <section>
+ <h2 data-kicker="Git">Comandos que van a usar seguido</h2>
+ <pre><code class="language-bash" data-trim>
+git checkout -b nombre-de-la-rama
+git add archivo.js
+git commit -m "mensaje"
+git push -u origin nombre-de-la-rama
+git pull
+ </code></pre>
+ <p class="pie-codigo">Crear rama, marcar cambio, guardarlo, subirlo, traer lo nuevo.
+ Con estos cinco alcanza para el trabajo diario.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">Comandos para revertir</h2>
+ <pre><code class="language-bash" data-trim>
+git log --oneline
+git revert &lt;hash&gt;
+git checkout -- archivo.js
+ </code></pre>
+ <p class="pie-codigo"><code>revert</code> es el que se usa en una rama compartida:
+ deshace un commit con uno nuevo, sin reescribir el historial. <code>checkout --</code>
+ descarta cambios que todavía no se han guardado.</p>
+ </section>
+
+ <section>
  <h2 data-kicker="Git">Commits con propósito</h2>
  <ul>
  <li>Un commit = un cambio con sentido. No "avances" ni "arreglos varios".</li>
@@ -203,6 +302,21 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <li>Sirve para revertir con precisión: se deshace un cambio, no una semana.</li>
  </ul>
  <p class="nota">El historial es la documentación que sí se mantiene actualizada.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Git">Un ejemplo</h2>
+ <pre><code class="language-text" data-trim>
+✗ fix
+✗ cambios varios
+✗ arreglo
+
+✓ Corrige cálculo de IVA en boletas con descuento
+✓ Agrega validación de RUT antes de guardar el formulario
+ </code></pre>
+ <p class="pie-codigo">El mensaje explica qué problema resuelve el cambio, no describe
+ el archivo que se tocó. Mejor aún si queda enlazado a la tarea de origen: algunos
+ sistemas lo hacen automático, en otros se agrega una integración para lograrlo.</p>
  </section>
 
  <!-- ═══════════ 2 · PULL REQUESTS ═══════════ -->
@@ -220,7 +334,7 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <li>Un lugar donde la conversación queda pegada al código.</li>
  <li><strong>El momento en que una máquina puede opinar antes que una persona.</strong></li>
  </ul>
- <p class="destacado">Sin pull request no hay dónde enchufar la verificación automática.
+ <p class="destacado">Sin pull request no hay dónde conectar la verificación automática.
  Todo lo que viene después de esta slide existe porque existe el PR.</p>
  </section>
 
@@ -234,12 +348,24 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  </ul>
  </section>
 
+ <section>
+ <h2 data-kicker="Pull request">Así se ve un diff</h2>
+ <pre><code class="language-diff" data-trim>
+  function calcularTotal(items) {
+-   return items.reduce((a, b) => a + b.precio, 0);
++   return items.reduce((a, b) => a + b.precio * b.cantidad, 0);
+  }
+ </code></pre>
+ <p class="pie-codigo">Rojo es lo que se saca, verde lo que se agrega. Se comenta línea
+ por línea, ahí mismo, antes de que el cambio llegue a nadie más.</p>
+ </section>
+
  <!-- ═══════════ 3 · CI Y CD ═══════════ -->
 
  <section class="chapter">
  <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">03</div>
  <h2>3 · Integración y despliegue continuo</h2>
- <p class="nota">Tres términos que se usan como sinónimos y no lo son.</p>
+ <p class="nota">Integración, entrega y despliegue continuo: tres pasos distintos, no sinónimos.</p>
  </section>
 
  <section>
@@ -250,8 +376,6 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <li>Construye · ejecuta pruebas · revisa reglas del proyecto.</li>
  <li>Deja evidencia automática: qué se verificó, cuándo y sobre qué código.</li>
  </ul>
- <p class="destacado">No requiere tocar los servidores de producción. Se puede adoptar
- mañana sin cambiar nada del despliegue actual.</p>
  </section>
 
  <section>
@@ -266,7 +390,7 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  </section>
 
  <section>
- <h2 data-kicker="Criterio">Cuál adoptar primero acá</h2>
+ <h2 data-kicker="Criterio">Cuál adoptar primero</h2>
  <p class="destacado" style="font-size:1.1em"><strong>Integración continua.</strong>
  En ese orden y sin saltarse pasos.</p>
  <ul>
@@ -275,6 +399,20 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <li>Construye lo único que hace posible automatizar el despliegue después:
  <strong>pruebas en las que el equipo confíe</strong>.</li>
  </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Criterio">¿Y si no se puede publicar en cada cambio?</h2>
+ <ul>
+ <li>La integración continua corre igual en cada cambio — eso no depende de con qué
+ frecuencia se publique.</li>
+ <li>Publicar sí se puede agrupar: una rama de <strong>release</strong> junta varios
+ cambios ya integrados y probados, y sale en una fecha fija (cada dos semanas, por ejemplo).</li>
+ <li>Es la misma idea de Gitflow que ya vimos: <code>develop</code> acumula,
+ <code>release</code> agrupa, <code>main</code> publica.</li>
+ </ul>
+ <p class="nota">Automatizar no obliga a publicar seguido. Obliga a que, cuando se
+ publique, sea siempre de la misma forma y ya esté probado.</p>
  </section>
 
  <!-- ═══════════ 4 · ANATOMÍA ═══════════ -->
@@ -312,6 +450,33 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  </ol>
  </section>
 
+ <section>
+ <h2 data-kicker="Pipeline">Cómo se identifica un artefacto</h2>
+ <ul>
+ <li><strong>Versión semántica</strong> (<code>2.4.1</code>) — la elige el equipo, sube cuando
+ hay cambios importantes o de compatibilidad.</li>
+ <li><strong>Hash de commit</strong> (<code>a3f9c1b</code>) — lo genera Git solo, identifica
+ exactamente qué código se compiló.</li>
+ <li>Muchos proyectos usan ambos: una versión legible para las personas, un hash para
+ rastrear con precisión.</li>
+ </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Pipeline">Pruebas según el lenguaje</h2>
+ <table style="font-size:.58em">
+ <tr><th>Lenguaje</th><th>Comando de prueba</th></tr>
+ <tr><td>.NET</td><td><code>dotnet test</code></td></tr>
+ <tr><td>Node / TypeScript</td><td><code>npm test</code></td></tr>
+ <tr><td>Python</td><td><code>pytest</code></td></tr>
+ <tr><td>Java</td><td><code>mvn test</code></td></tr>
+ <tr><td>PHP</td><td><code>phpunit</code></td></tr>
+ <tr><td>Go</td><td><code>go test ./...</code></td></tr>
+ </table>
+ <p class="nota">El comando cambia según el proyecto — y también dónde corre, según el
+ framework. La idea (compilar y probar en una máquina limpia, siempre igual) es la
+ misma para todos.</p>
+ </section>
 
  <section>
  <h2 data-kicker="Pipeline">El pipeline es un archivo</h2>
@@ -336,7 +501,8 @@ on:
  branches: [main]
  </code></pre>
  <p class="pie-codigo">Dos disparadores: cada propuesta de cambio, y cada cambio
- que entra a la rama principal.</p>
+ que entra a la rama principal. Fusionar un pull request <strong>ya es</strong> un push a
+ <code>main</code>: no hace falta un disparador aparte para eso.</p>
  </section>
 
  <section>
@@ -359,7 +525,21 @@ jobs:
  run: node test/validar.mjs
  </code></pre>
  <p class="pie-codigo">Máquina limpia, código, herramientas, construir, validar.
- Si un paso falla, se detiene ahí.</p>
+ Si un paso falla, se detiene ahí. <code>runs-on</code> también acepta
+ <code>windows-latest</code>, <code>macos-latest</code> o un runner propio — se elige según
+ qué necesite compilar el proyecto (.NET clásico, por ejemplo, pide Windows).</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Pipeline">Qué son estos "uses"</h2>
+ <ul>
+ <li><code>uses: actions/checkout@v4</code> — descarga el código del repositorio dentro
+ del runner. Sin este paso, no hay nada que compilar.</li>
+ <li><code>uses: actions/setup-node@v4</code> — instala la versión de Node declarada.
+ Cada lenguaje tiene su equivalente: <code>setup-dotnet</code>, <code>setup-java</code>...</li>
+ <li>Son piezas reutilizables que otros ya escribieron y mantienen: no hay que armarlas
+ de cero.</li>
+ </ul>
  </section>
 
  <section>
@@ -378,7 +558,8 @@ jobs:
  run: npx firebase deploy
  </code></pre>
  <p class="pie-codigo"><code>needs</code> obliga a que la verificación pase primero.
- El <code>if</code> impide publicar desde una propuesta de cambio.</p>
+ El <code>if</code> impide publicar desde una propuesta de cambio. Fusionar un pull
+ request cuenta como <code>push</code>, así que sí dispara la publicación.</p>
  </section>
 
  <section>
@@ -405,16 +586,18 @@ jobs:
  <li>Si alguien se va de la empresa, <strong>el despliegue no se cae</strong>.</li>
  <li>Rotar esa credencial no obliga a tocar el código.</li>
  </ul>
- <p class="nota">Es el primer error que se comete al automatizar: usar el usuario
+ <p class="nota">El primer error que se comete al automatizar: usar el usuario
  del que armó el pipeline.</p>
  </section>
 
  <section>
- <h2 data-kicker="Concepto">Esto no es un diagrama</h2>
- <p>El material que están viendo vive en un repositorio y está preparado para recorrer
- este mismo flujo de automatización.</p>
- <p class="destacado">Abajo a la derecha está la <strong>versión publicada</strong>.
- Ese número identifica exactamente qué código están viendo.</p>
+ <h2 data-kicker="Concepto">Este pipeline es real, no un ejemplo</h2>
+ <p>Esta misma presentación vive en un repositorio de Git y se publica con exactamente
+ el pipeline que acaban de ver: build, validación y despliegue automáticos.</p>
+ <p class="destacado">El número abajo a la derecha es el <strong>hash del commit de
+ <code>main</code></strong> que está publicado ahora mismo — lo genera el pipeline en
+ cada build. Se puede comprobar: es el mismo hash que figura como último commit de
+ <code>main</code> en GitHub.</p>
  <aside class="notes">
  Explicar conceptualmente dónde vive el pipeline y cómo se relaciona con el repositorio.
  Dejar la demostración operativa y la ejecución en vivo para la segunda sesión.
@@ -423,15 +606,17 @@ jobs:
  </section>
 
  <section>
- <h2 data-kicker="Configuración">Cómo se deja funcionando</h2>
- <p class="nota">Tres configuraciones, una sola vez. Sin esto, el pipeline avisa
- pero no protege.</p>
+ <h2 data-kicker="Configuración">Lo que hay que activar aparte del código</h2>
+ <p class="nota">El archivo del pipeline no alcanza solo. Faltan tres configuraciones del
+ repositorio, una sola vez: sin ellas, el pipeline corre y marca error en rojo, pero nada
+ impide que igual se fusione o se publique.</p>
  </section>
 
  <section>
  <h2 data-kicker="Seguridad">Permiso para publicar</h2>
  <ul>
- <li>Se crea una <strong>cuenta de servicio</strong> en el proveedor de hosting.</li>
+ <li>Se crea una <strong>cuenta de servicio</strong> en el destino que corresponda:
+ hosting, un proveedor de nube, un servidor propio o una base de datos.</li>
  <li>Se le da <strong>solo</strong> el permiso de publicar. Nada más.</li>
  <li>Su credencial se guarda como secret del repositorio.</li>
  </ul>
@@ -465,14 +650,13 @@ Settings → Branches → Add rule → main
  </section>
 
  <section>
- <h2 data-kicker="Resumen">Lo que acaban de ver</h2>
+ <h2 data-kicker="Resumen">Con qué queda configurado el repositorio</h2>
  <ul>
  <li>Un archivo que describe el proceso completo de despliegue.</li>
  <li>Una identidad de máquina con permisos mínimos.</li>
- <li>Una regla que impide publicar sin verificar.</li>
+ <li>Una regla activada con dos casillas: <strong>requerir pull request</strong> y
+ <strong>requerir que la verificación pase</strong> antes de fusionar.</li>
  </ul>
- <p class="destacado">Nada de esto es una herramienta cara ni un proyecto de meses.
- Son tres archivos y dos casillas.</p>
  </section>
 
 
@@ -498,12 +682,14 @@ Settings → Branches → Add rule → main
  <h2 data-kicker="Contenedores">Construir una vez, promover</h2>
  <ul>
  <li>La imagen se construye <strong>una sola vez</strong>, en el pipeline.</li>
- <li>Queda en un <strong>registro</strong>, etiquetada con su versión.</li>
+ <li>Queda en un <strong>registro</strong>, etiquetada con su versión — misma idea que una
+ etiqueta de Git, pero apunta a la imagen ya compilada, no al código fuente.</li>
  <li>El servidor solo descarga y levanta. Nada más.</li>
  <li>Revertir es levantar la etiqueta anterior: segundos, no una recompilación.</li>
  </ul>
  <p class="destacado">Lo que se probó y lo que se publica son <strong>exactamente el mismo
- artefacto</strong>. Sin registro intermedio, eso no se puede garantizar.</p>
+ artefacto</strong>. Sin registro intermedio, cada ambiente reconstruye por su cuenta y
+ puede levantar dependencias distintas según el día: mismo código fuente, bytes distintos.</p>
  </section>
 
  <!-- ═══════════ 6 · PRUEBAS Y REVERSIBILIDAD ═══════════ -->
@@ -530,7 +716,7 @@ Settings → Branches → Add rule → main
  <h2 data-kicker="Pruebas">Pruebas donde hoy no hay ninguna</h2>
  <ul>
  <li>No se empieza por cobertura. Se empieza por <strong>el camino crítico</strong>:
- lo que si falla, se nota en la caja.</li>
+ lo que si falla, se nota apenas alguien lo usa.</li>
  <li>Cada vez que aparece un error en producción, <strong>la prueba es lo primero
  que se escribe</strong>. Así no vuelve.</li>
  <li>Diez pruebas que el equipo confía valen más que doscientas que nadie mira.</li>
@@ -538,21 +724,30 @@ Settings → Branches → Add rule → main
  </section>
 
  <section>
- <h2 data-kicker="Alcance">La base de datos: un límite importante</h2>
- <p class="destacado" style="font-size:1.05em">En esta etapa, <strong>no automatizamos</strong>
- los cambios de esquema de base de datos.</p>
+ <h2 data-kicker="Alcance">La base de datos no se revierte con el código</h2>
+ <p>Si revierten una versión, el código vuelve atrás. La base de datos no — sus datos y
+ su estructura se quedan como están.</p>
  <ul>
- <li>Si el esquema cambia, revertir el código <strong>no necesariamente revierte</strong> la base de datos:
- en el mismo despliegue.</li>
- <li>El código nuevo funciona con el esquema viejo. El viejo, con el nuevo.</li>
- <li>Lo que sobra se elimina <strong>en un despliegue posterior</strong>, cuando ya no hay
- a qué volver.</li>
+ <li>Por eso, cuando el código nuevo cambia el esquema, tiene que poder funcionar
+ <strong>también</strong> con el esquema viejo, al menos por un tiempo.</li>
+ <li>Recién cuando ya no hace falta volver atrás, se limpia lo que sobra.</li>
  </ul>
  <p class="nota">Aplica igual aunque los cambios de base sigan siendo manuales.</p>
  <aside class="notes">
  Mantener esta sección breve. El objetivo es entender por qué la base de datos
- queda fuera de esta primera automatización, no enseñar migraciones.
+ es un límite aparte, no enseñar migraciones.
  </aside>
+ </section>
+
+ <section>
+ <h2 data-kicker="Alcance">También se puede versionar la base de datos</h2>
+ <ul>
+ <li>Herramientas como <strong>Flyway</strong> o <strong>Liquibase</strong> versionan los cambios
+ de esquema igual que Git versiona el código.</li>
+ <li>Se ejecutan como un paso más del mismo pipeline, cuando el equipo esté listo.</li>
+ </ul>
+ <p class="nota">No es una decisión de hoy. Es una puerta que queda abierta para cuando la
+ necesiten.</p>
  </section>
 
  <!-- ═══════════ 7 · HERRAMIENTAS ═══════════ -->
@@ -590,21 +785,32 @@ Settings → Branches → Add rule → main
  <tr>
  <td>Curva</td><td>Baja</td><td>Baja</td><td>Alta: plugins y complementos</td>
  </tr>
- <tr>
- <td>Migración</td><td><strong>Nada: ya están en GitHub</strong></td>
- <td>Mover todos los repositorios</td><td>Montar y configurar de cero</td>
- </tr>
  </table>
  </section>
 
  <section>
- <h2 data-kicker="Decisión">Recomendación</h2>
- <p class="destacado" style="font-size:1.15em"><strong>Para este contexto: GitHub Actions.</strong></p>
+ <h2 data-kicker="Decisión">Otras opciones frecuentes</h2>
  <ul>
- <li>El código ya vive ahí: <strong>cero migración</strong> y el pipeline queda al lado
- del pull request que lo dispara.</li>
- <li>No hay servidor que mantener. Jenkins pediría infraestructura y alguien a cargo.</li>
- <li>GitLab es igualmente válido, pero <strong>implicaría migrar</strong> y no aporta una ventaja que justifique ese costo.</li>
+ <li><strong>AWS</strong> — CodePipeline / CodeBuild.</li>
+ <li><strong>Azure</strong> — Azure Pipelines.</li>
+ <li><strong>Google Cloud</strong> — Cloud Build.</li>
+ <li><strong>Bitbucket</strong> — Bitbucket Pipelines. <strong>CircleCI</strong> —
+ independiente de dónde viva el código.</li>
+ </ul>
+ <p class="nota">El criterio no cambia: conviene la herramienta que ya vive donde vive
+ el código y el resto de la infraestructura, no la que tiene más funciones.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Decisión">Cómo elegir, en general</h2>
+ <p class="destacado" style="font-size:1.1em"><strong>La opción por defecto: la herramienta
+ de donde ya vive el código.</strong></p>
+ <ul>
+ <li>En GitHub → GitHub Actions. En GitLab → GitLab CI/CD. En Bitbucket → Bitbucket
+ Pipelines. En una nube → su pipeline nativo.</li>
+ <li>Cero migración, cero infraestructura nueva que mantener.</li>
+ <li>Jenkins u otra opción autoalojada se justifica con una razón concreta: por
+ ejemplo, una política de seguridad que exige que el código nunca salga de la red interna.</li>
  </ul>
  </section>
 
@@ -638,12 +844,48 @@ Settings → Branches → Add rule → main
  </aside>
  </section>
 
+ <section>
+ <h2 data-kicker="Métricas">Por qué estas cuatro</h2>
+ <p>No son las únicas posibles, pero son las que más se repiten en la industria del
+ software para responder una pregunta simple: <strong>¿esto realmente mejoró la forma
+ en que publicamos?</strong></p>
+ <p class="nota">Dos miden velocidad (frecuencia, tiempo de entrega). Dos miden
+ estabilidad (fallos, recuperación). Un equipo sano mejora en las cuatro a la vez.</p>
+ </section>
+
  <!-- ═══════════ CIERRE ═══════════ -->
 
  <section>
+ <h2 data-kicker="Resumen">Todo el recorrido, junto</h2>
+ <div class="flow-row">
+ <div class="destacado fragment">Rama</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">Commit</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">Pull request</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">CI: build + pruebas</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">Revisión</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">main</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">Imagen versionada</div><span class="arrow fragment">→</span>
+ <div class="destacado fragment">Deploy</div>
+ </div>
+ <p class="nota" style="text-align:center;margin-top:1.2em;">
+ Esto es lo que vimos hoy: el camino de un cambio, de la rama a producción.
+ </p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Para seguir creciendo">Por acá se suele empezar</h2>
+ <ul>
+ <li>Integración y despliegue continuo es, en la práctica, <strong>la puerta de
+ entrada</strong> a DevOps: es lo que más rápido se implementa y lo que más se nota.</li>
+ <li>Una vez que este flujo existe, el resto — <strong>monitoreo, observabilidad,
+ infraestructura como código</strong> — se apoya en él en vez de partir de cero.</li>
+ <li>Cada pieza nueva se suma sobre esta base, no en paralelo a ella.</li>
+ </ul>
+ </section>
+
+ <section>
  <h2 data-kicker="Siguiente paso">La próxima sesión: laboratorio</h2>
- <p>Cada uno va a ejecutar el ciclo completo sobre este mismo repositorio.
- Ningún ejercicio toca sus sistemas.</p>
+ <p>Cada uno va a ejecutar el ciclo completo sobre este mismo repositorio.</p>
  <ul>
  <li>Rama propia · primer pull request · verificación automática.</li>
  <li><strong>Rechazo controlado</strong> — las pruebas fallan a propósito y el sistema
@@ -661,12 +903,14 @@ Settings → Branches → Add rule → main
  <section>
  <h2 data-kicker="Siguiente paso">Para la próxima sesión</h2>
  <ul>
- <li>Su <strong>nombre de usuario de GitHub</strong> — los necesito con dos días hábiles
- de anticipación para darles acceso.</li>
+ <li>Su <strong>nombre de usuario de GitHub</strong></li>
  <li><strong>Git instalado</strong> en el computador con el que van a trabajar.</li>
- <li>Las <strong>mismas personas</strong> de hoy.</li>
  </ul>
- <p class="nota">Houston Lab SpA · huolivares@gmail.com</p>
+ </section>
+
+ <section class="chapter">
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40" style="margin-bottom:1em;"><g fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="square"><path d="M4 13V4h9"/><path d="M27 4h9v9"/><path d="M36 27v9h-9"/><path d="M13 36H4v-9"/></g><circle cx="20" cy="20" r="5.5" fill="#E8871A"/></svg>
+ <h2 data-kicker="Fin de la sesión">Gracias</h2>
  </section>
 
  </div>
@@ -684,7 +928,7 @@ Settings → Branches → Add rule → main
  maxScale: 2.0,
  hash: true,
  slideNumber: 'c/t',
- transition: 'fade',
+ transition: 'slide',
  transitionSpeed: 'fast',
  backgroundTransition: 'fade',
  controlsTutorial: false,
