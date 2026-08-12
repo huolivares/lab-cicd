@@ -5,73 +5,129 @@
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <title>Integración y despliegue continuo</title>
 
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
 <style>
 :root {
-  --tinta:#0E1A2B; --ambar:#E8871A; --gris:#7A8794; --fondo:#F3F5F8;
-  --blanco:#FFF; --linea:rgba(14,26,43,.11); --ambar-soft:rgba(232,135,26,.12);
+  --tinta:#0E1A2B; --tinta-2:#16283F; --ambar:#E8871A; --ambar-2:#FFB25C;
+  --gris:#7A8794; --fondo:#F4F5F8; --blanco:#FFF;
+  --linea:rgba(14,26,43,.08); --ambar-soft:rgba(232,135,26,.10);
+  --font-sans:'Inter','Segoe UI',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','SFMono-Regular',Consolas,ui-monospace,monospace;
 }
 *{box-sizing:border-box}
-body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparent 25%),var(--fondo)}
-.reveal{font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--tinta);font-size:34px;background:transparent}
-.reveal .slides section{
-  text-align:left;padding:34px 54px;border-radius:28px;background:rgba(255,255,255,.96);
-  box-shadow:0 18px 55px rgba(14,26,43,.09);border:1px solid rgba(14,26,43,.06);overflow:hidden;
+html{background:var(--fondo)}
+body{
+  background:
+    radial-gradient(circle at 88% 6%,rgba(232,135,26,.09),transparent 26%),
+    radial-gradient(circle at 6% 96%,rgba(14,26,43,.05),transparent 32%),
+    var(--fondo);
 }
-.reveal .slides section::before{content:"";position:absolute;left:0;top:0;width:9px;height:100%;background:var(--ambar)}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background-image:radial-gradient(rgba(14,26,43,.06) 1px,transparent 1px);
+  background-size:26px 26px;
+  -webkit-mask-image:radial-gradient(circle at 50% 32%,black,transparent 72%);
+  mask-image:radial-gradient(circle at 50% 32%,black,transparent 72%);
+}
+.reveal{font-family:var(--font-sans);color:var(--tinta);font-size:34px;background:transparent;font-weight:450}
+.reveal .slides section{
+  text-align:left;padding:56px 68px;border-radius:26px;background:var(--blanco);
+  box-shadow:0 30px 70px -20px rgba(14,26,43,.18),0 2px 8px rgba(14,26,43,.05);
+  border:1px solid rgba(14,26,43,.05);overflow:hidden;
+}
 .reveal .slides section:first-child{
   text-align:center;display:flex!important;flex-direction:column;justify-content:center;align-items:center;
-  background:radial-gradient(circle at 78% 22%,rgba(232,135,26,.22),transparent 24%),linear-gradient(135deg,#0E1A2B,#14243A);
-  color:white;border:0;box-shadow:0 24px 80px rgba(14,26,43,.28);
+  background:
+    radial-gradient(circle at 80% 14%,rgba(232,135,26,.28),transparent 30%),
+    radial-gradient(circle at 8% 92%,rgba(232,135,26,.10),transparent 34%),
+    linear-gradient(160deg,#0B1626,#152742 60%,#0E1A2B);
+  color:white;border:0;box-shadow:0 40px 100px rgba(14,26,43,.35);
 }
 .reveal .slides section:first-child h1,.reveal .slides section:first-child h2{color:white;border:0}
-.reveal .slides section:first-child .nota{color:rgba(255,255,255,.72)}
-.reveal h1,.reveal h2,.reveal h3{font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--tinta);text-transform:none;letter-spacing:-.035em;line-height:1.08;font-weight:800}
-.reveal h1{font-size:2.35em;max-width:950px;margin-bottom:.25em}
-.reveal h2{font-size:1.42em;display:block;border:0;padding:0 0 .42em;margin:0 0 .65em;position:relative}
-.reveal h2::after{content:"";position:absolute;left:0;bottom:0;width:62px;height:5px;border-radius:99px;background:var(--ambar)}
-.reveal .slides section:first-child h2::after,.reveal .slides section.chapter h2::after{display:block}
+.reveal .slides section:first-child .nota{color:rgba(255,255,255,.68)}
+.reveal h1,.reveal h2,.reveal h3{font-family:var(--font-sans);color:var(--tinta);text-transform:none;letter-spacing:-.032em;line-height:1.07;font-weight:800}
+.reveal h1{font-size:2.55em;max-width:940px;margin-bottom:.28em;font-weight:900}
+.reveal h2{font-size:1.5em;display:block;border:0;padding:0;margin:0 0 .78em;position:relative}
+.reveal .slides section:not(:first-child) h2[data-kicker]::before{
+  content:"— " attr(data-kicker);display:block;font-family:var(--font-mono);font-size:.32em;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--ambar);font-weight:700;margin-bottom:.85em;
+}
 .reveal ul,.reveal ol{display:block;margin-left:.85em}
-.reveal li{margin-bottom:.42em;line-height:1.28}
+.reveal li{margin-bottom:.48em;line-height:1.32}
 .reveal li::marker{color:var(--ambar);font-weight:800}
-.reveal p{line-height:1.38}
-.reveal strong{font-weight:800}
-.reveal .nota{color:var(--gris);font-size:.70em}
+.reveal p{line-height:1.42}
+.reveal strong{font-weight:800;color:var(--tinta)}
+.reveal .nota{color:var(--gris);font-size:.70em;font-weight:500}
 .reveal .destacado{
-  background:linear-gradient(90deg,var(--ambar-soft),rgba(243,245,248,.65));
-  border:1px solid rgba(232,135,26,.22);border-left:5px solid var(--ambar);border-radius:14px;
-  padding:.65em .9em;text-align:left;font-size:.80em;margin-top:.65em;box-shadow:0 8px 25px rgba(14,26,43,.045)
+  background:var(--blanco);border:1px solid var(--linea);border-left:3px solid var(--ambar);
+  border-radius:16px;padding:.85em 1.1em;text-align:left;font-size:.80em;margin-top:.7em;
+  box-shadow:0 16px 36px -14px rgba(14,26,43,.12);
 }
-.reveal code{font-family:"SFMono-Regular",Consolas,ui-monospace,monospace}
-.reveal pre{width:100%;box-shadow:0 16px 35px rgba(14,26,43,.12);margin:.55em 0;font-size:.44em;border-radius:14px;overflow:hidden}
-.reveal pre code{padding:1em 1.15em;max-height:520px;border-radius:14px;line-height:1.35}
-.reveal .pie-codigo{font-size:.67em;color:var(--gris);margin-top:.45em}
-.reveal table{border-collapse:separate;border-spacing:0;width:100%;border-radius:16px;border:1px solid var(--linea);box-shadow:0 12px 30px rgba(14,26,43,.07);background:white;overflow:hidden}
-.reveal th{background:var(--tinta);color:white;font-weight:700}
-.reveal td,.reveal th{padding:.65em .75em;border-bottom:1px solid var(--linea);border-right:1px solid var(--linea)}
-.reveal tr:last-child td{border-bottom:0}.reveal td:last-child,.reveal th:last-child{border-right:0}
-.marca{position:fixed;bottom:16px;left:22px;z-index:40;font-family:Inter,"Segoe UI",system-ui,sans-serif;font-size:11px;color:var(--gris);letter-spacing:2.5px;text-transform:uppercase;font-weight:700}
+.reveal code{font-family:var(--font-mono);font-weight:600}
+.reveal pre{
+  width:100%;margin:.75em 0 .6em;font-size:.44em;border-radius:14px;overflow:hidden;
+  box-shadow:0 24px 50px -16px rgba(14,26,43,.30);background:#272822;position:relative;padding-top:2.15em;
+}
+.reveal pre::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2.15em;
+  background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.07);
+}
+.reveal pre::after{
+  content:"";position:absolute;top:.78em;left:1em;width:.55em;height:.55em;border-radius:50%;
+  background:#FF5F57;box-shadow:1.05em 0 0 #FEBC2E,2.1em 0 0 #28C840;
+}
+.reveal .slides section pre code{padding:0 1.15em 1.1em;max-height:480px;border-radius:0;line-height:1.4;background:transparent!important;color:#ddd}
+.reveal .pie-codigo{font-size:.66em;color:var(--gris);margin-top:.5em;font-weight:500}
+.reveal table{border-collapse:collapse;width:100%;border-radius:18px;border:1px solid var(--linea);box-shadow:0 18px 40px -16px rgba(14,26,43,.14);background:var(--blanco);overflow:hidden}
+.reveal th{background:var(--fondo);color:var(--tinta);font-weight:800;text-transform:uppercase;font-size:.76em;letter-spacing:.05em;border-bottom:2px solid var(--tinta)}
+.reveal td,.reveal th{padding:.75em .9em;border-bottom:1px solid var(--linea)}
+.reveal tr:last-child td{border-bottom:0}
+.reveal tr:nth-child(even) td{background:rgba(14,26,43,.02)}
+.marca{
+  position:fixed;bottom:20px;left:24px;z-index:40;font-family:var(--font-sans);font-size:11px;color:var(--gris);
+  letter-spacing:2px;text-transform:uppercase;font-weight:700;background:rgba(255,255,255,.75);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:6px 12px 6px 8px;border-radius:999px;
+  border:1px solid rgba(14,26,43,.06);box-shadow:0 8px 20px rgba(14,26,43,.06);
+}
 .marca b{color:var(--tinta);font-weight:900}
-.version{position:fixed;bottom:16px;right:22px;z-index:40;font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;color:var(--gris);background:rgba(255,255,255,.75);padding:4px 8px;border-radius:999px;border:1px solid var(--linea)}
-.reveal .slides section:not(:first-child) h2::before{
-  content:attr(data-kicker);display:block;font-size:.38em;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--ambar);font-weight:900;margin-bottom:.55em
+.version{
+  position:fixed;bottom:20px;right:24px;z-index:40;font-family:var(--font-mono);font-size:11px;color:var(--gris);
+  background:rgba(255,255,255,.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  padding:6px 12px;border-radius:999px;border:1px solid rgba(14,26,43,.06);box-shadow:0 8px 20px rgba(14,26,43,.06);
 }
-.reveal .slides section.chapter{background:var(--tinta);color:white;display:flex!important;flex-direction:column;justify-content:center;border:0}
-.reveal .slides section.chapter::before{width:14px}
-.reveal .slides section.chapter h2{color:white;font-size:1.9em}
-.reveal .slides section.chapter .nota{color:rgba(255,255,255,.66)}
-.reveal .slides section.chapter h2::after{width:90px;height:6px}
-.flow-row{display:flex;align-items:center;justify-content:center;gap:.28em;margin-top:1.2em;flex-wrap:wrap}
-.flow-row .destacado{margin:0;text-align:center;min-width:135px;padding:.7em .8em;background:white;box-shadow:0 10px 24px rgba(14,26,43,.08);border-left-width:4px;font-weight:750}
-.flow-row .arrow{color:var(--ambar);font-weight:900;font-size:1.05em}
-.reveal .slides section code{color:var(--tinta);background:rgba(232,135,26,.10);padding:.06em .25em;border-radius:5px}
-.reveal .slides section pre code{background:#272822;color:#ddd}
+.reveal .slides section.chapter{
+  background:
+    radial-gradient(circle at 85% 20%,rgba(232,135,26,.16),transparent 32%),
+    linear-gradient(155deg,#0B1626,#16283F 65%,#0E1A2B);
+  color:white;display:flex!important;flex-direction:column;justify-content:center;border:0;
+  box-shadow:0 40px 100px rgba(14,26,43,.35);
+}
+.reveal .slides section.chapter[data-num]::before{
+  content:attr(data-num);position:absolute;top:-.14em;right:.3em;font-family:var(--font-mono);font-weight:800;
+  font-size:7.5em;color:rgba(255,255,255,.07);letter-spacing:-.02em;line-height:1;pointer-events:none;
+}
+.reveal .slides section.chapter h2{color:white;font-size:2.15em;max-width:820px;position:relative}
+.reveal .slides section.chapter .nota{color:rgba(255,255,255,.62);font-size:.55em;margin-top:.35em}
+.reveal .slides section.chapter h2[data-kicker]::before{color:var(--ambar-2)}
+.flow-row{display:flex;align-items:center;justify-content:center;gap:.4em;margin-top:1.25em;flex-wrap:wrap}
+.flow-row .destacado{
+  margin:0;text-align:center;min-width:128px;padding:.65em .9em;background:var(--blanco);
+  box-shadow:0 12px 28px -12px rgba(14,26,43,.16);border:1px solid var(--linea);border-left:none;
+  border-radius:12px;font-weight:700;font-size:.9em;color:var(--tinta);
+}
+.flow-row .arrow{color:var(--ambar);font-weight:400;font-size:1.3em;opacity:.75}
+.reveal .slides section code{color:var(--tinta);background:rgba(232,135,26,.10);padding:.07em .3em;border-radius:5px;font-size:.92em}
 .reveal .slides section a{color:var(--ambar);font-weight:700;text-decoration:none}
 .reveal .slides section a:hover{text-decoration:underline}
-@media(max-width:1000px){.reveal{font-size:28px}.reveal .slides section{padding:28px 38px;border-radius:22px}}
+.reveal .progress{color:var(--ambar);height:4px;top:0;bottom:auto}
+.reveal .progress span{background:linear-gradient(90deg,var(--ambar),var(--ambar-2))}
+.reveal .controls{display:none}
+@media(max-width:1000px){.reveal{font-size:28px}.reveal .slides section{padding:40px 44px;border-radius:22px}}
 </style>
 
 </head>
@@ -91,14 +147,14 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
 
  <section>
  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="52" height="52" style="margin-bottom:.9em;"><g fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="square"><path d="M4 13V4h9"/><path d="M27 4h9v9"/><path d="M36 27v9h-9"/><path d="M13 36H4v-9"/></g><circle cx="20" cy="20" r="5.5" fill="#E8871A"/></svg>
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.18em;font-size:.52em;text-transform:uppercase;margin-bottom:1.5em;">Houston Lab</div>
+ <div style="font-family:var(--font-mono);color:var(--ambar);font-weight:700;letter-spacing:.18em;font-size:.5em;text-transform:uppercase;margin-bottom:1.6em;">Houston Lab</div>
  <h1>Integración y despliegue continuo</h1>
  <p class="nota">Sesión 1 · Fundamentos y criterio</p>
  <div style="margin-top:1.8em;display:flex;align-items:center;gap:.6em;">
- <div style="width:38px;height:38px;border-radius:999px;background:var(--ambar);color:var(--tinta);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;">HO</div>
+ <div style="width:40px;height:40px;border-radius:999px;background:var(--ambar);color:var(--tinta);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;box-shadow:0 10px 24px rgba(232,135,26,.4);">HO</div>
  <div style="text-align:left;">
  <div style="font-weight:800;font-size:20px;color:white;">Hugo Olivares</div>
- <div style="font-size:13px;color:rgba(255,255,255,.65);letter-spacing:.08em;text-transform:uppercase;">Technical Lead</div>
+ <div style="font-size:13px;color:rgba(255,255,255,.6);letter-spacing:.08em;text-transform:uppercase;font-weight:600;">Technical Lead</div>
  </div>
  </div>
  <aside class="notes">Bloque completo de apertura (presentación, problema de DevOps y caso Knight Capital): ~15 minutos.</aside>
@@ -178,8 +234,7 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <p style="font-size:1.3em; margin:1em 0;">¿Qué pasa si mañana <strong>no están</strong>
  las personas que despliegan?</p>
  <aside class="notes">
- No responder. Dejar que hablen 2-3 minutos. Lo que digan es el resto de la sesión.
- No sermonear: el procedimiento actual funcionó mientras el volumen fue menor.
+ Pregunta para la audiencia.
  </aside>
  </section>
 
@@ -214,8 +269,7 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
 
  <!-- ═══════════ 1 · GIT APLICADO ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">01</div>
+ <section class="chapter" data-num="01">
  <h2>1 · Git aplicado</h2>
  <p class="nota">Ramas, commits y por qué la rama principal no se toca.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~18 minutos.</aside>
@@ -388,8 +442,7 @@ git checkout -- archivo.js
 
  <!-- ═══════════ 2 · PULL REQUESTS ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">02</div>
+ <section class="chapter" data-num="02">
  <h2>2 · El pull request</h2>
  <p class="nota">Punto de control y, sobre todo, el gancho de toda la automatización.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~10 minutos.</aside>
@@ -443,8 +496,7 @@ git checkout -- archivo.js
 
  <!-- ═══════════ 3 · CI Y CD ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">03</div>
+ <section class="chapter" data-num="03">
  <h2>3 · Integración y despliegue continuo</h2>
  <p class="nota">Integración, entrega y despliegue continuo: tres pasos distintos, no sinónimos.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~11 minutos.</aside>
@@ -513,8 +565,7 @@ git checkout -- archivo.js
 
  <!-- ═══════════ 4 · ANATOMÍA ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">04</div>
+ <section class="chapter" data-num="04">
  <h2>4 · Anatomía de un pipeline</h2>
  <p class="nota">El modelo que vamos a utilizar para entender el recorrido de un cambio.</p>
  <aside class="notes">Es el bloque más largo y técnico: ~28 minutos, incluida la trivia.</aside>
@@ -809,8 +860,7 @@ Settings → Branches → Add rule → main
 
  <!-- ═══════════ 5 · CONTENEDORES ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">05</div>
+ <section class="chapter" data-num="05">
  <h2>5 · Contenedores y registro de imágenes</h2>
  <p class="nota">El mismo artefacto, en todos lados: qué cambia al empaquetar el código.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~10 minutos.</aside>
@@ -885,8 +935,7 @@ Settings → Branches → Add rule → main
 
  <!-- ═══════════ 6 · PRUEBAS Y REVERSIBILIDAD ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">06</div>
+ <section class="chapter" data-num="06">
  <h2>6 · Pruebas y reversibilidad</h2>
  <p class="nota">Cómo validar cuando la infraestructura no da para un ambiente espejo.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~10 minutos.</aside>
@@ -941,7 +990,7 @@ Settings → Branches → Add rule → main
  <p class="nota">Aplica igual aunque los cambios de base sigan siendo manuales.</p>
  <aside class="notes">
  Mantener esta sección breve. El objetivo es entender por qué la base de datos
- es un límite aparte, no enseñar migraciones.
+ es un límite aparte.
  </aside>
  </section>
 
@@ -972,8 +1021,7 @@ Settings → Branches → Add rule → main
 
  <!-- ═══════════ 7 · HERRAMIENTAS ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">07</div>
+ <section class="chapter" data-num="07">
  <h2>7 · Comparativa de herramientas</h2>
  <p class="nota">Evaluadas contra sus criterios, no en abstracto.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~10 minutos.</aside>
@@ -1057,8 +1105,7 @@ Settings → Branches → Add rule → main
 
  <!-- ═══════════ 8 · MÉTRICAS ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">08</div>
+ <section class="chapter" data-num="08">
  <h2>8 · Cómo se mide todo esto</h2>
  <ul>
  <li><strong>Frecuencia de despliegue</strong>: cada cuánto llega algo a producción.</li>
@@ -1156,10 +1203,7 @@ Settings → Branches → Add rule → main
  <li>Revisión entre pares · fusión, despliegue y reversión.</li>
  </ul>
  <aside class="notes">
- NO CERRAR SIN ESTO:
- · pedir los nombres de usuario de GitHub de cada participante
- · confirmar que asisten las mismas personas
- · confirmar que todos llegan con Git instalado
+ pedir los nombres de usuario de GitHub de cada participante
  </aside>
  </section>
 
@@ -1169,6 +1213,15 @@ Settings → Branches → Add rule → main
  <li>Su <strong>nombre de usuario de GitHub</strong></li>
  <li><strong>Git instalado</strong> en el computador con el que van a trabajar.</li>
  </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Trivia · Resultados">¡Veamos quién ganó!</h2>
+ <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Ranking final en Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
+ <p class="nota" style="text-align:center;">Compartir la pantalla de resultados antes de cerrar la sesión.</p>
+ <aside class="notes">
+ Cambiar a la vista de leaderboard/resultados finales en Mentimeter.
+ </aside>
  </section>
 
  <section class="chapter">
