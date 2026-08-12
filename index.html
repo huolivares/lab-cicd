@@ -1124,11 +1124,13 @@ Settings → Branches → Add rule → main
  <ul>
  <li>Integración y despliegue continuo es, en la práctica, <strong>la puerta de
  entrada</strong> a DevOps: es lo que más rápido se implementa y lo que más se nota.</li>
- <li>Una vez que este flujo existe, el resto se apoya en él en vez de partir de cero:
- por ejemplo, <strong>monitoreo</strong> (saber si el sistema funciona ahora) y
- <strong>observabilidad</strong> (entender por qué, cuando algo falla) se agregan como
- pasos del mismo pipeline.</li>
- <li>Cada pieza nueva se suma sobre esta base, no en paralelo a ella.</li>
+ <li><strong>Monitoreo</strong> (saber si el sistema funciona ahora) y
+ <strong>observabilidad</strong> (entender por qué, cuando algo falla) no dependen de
+ tener CI/CD. Pero una vez que el pipeline existe, es más barato engancharlos ahí que
+ armarlos aparte: por ejemplo, un healthcheck automático después de cada deploy, o
+ taguear cada release con su versión para correlacionar incidentes.</li>
+ <li>Por eso el orden práctico suele ser: primero el pipeline, después las piezas que
+ se apoyan en él.</li>
  </ul>
  </section>
 
