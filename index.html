@@ -91,6 +91,8 @@ html,body{background:var(--fondo)}
 }
 .reveal .slides section.chapter h2{color:white;font-size:2.15em;max-width:820px}
 .reveal .slides section.chapter .nota{color:rgba(255,255,255,.62);font-size:.55em;margin-top:.35em}
+.reveal .slides section.chapter strong{color:white}
+.reveal .slides section.chapter .destacado,.reveal .slides section.chapter .destacado strong{color:var(--tinta)}
 .flow-row{display:flex;align-items:center;justify-content:center;gap:.5em;margin-top:1.25em;flex-wrap:wrap}
 .flow-row .destacado{
   margin:0;text-align:center;min-width:128px;padding:.65em .9em;background:var(--blanco);
@@ -158,7 +160,7 @@ html,body{background:var(--fondo)}
  <li>DevOps como marco, y por qué importa</li>
  <li>Git aplicado y pull request</li>
  <li>CI/CD y anatomía de un pipeline</li>
- <li>Contenedores, pruebas y reversibilidad</li>
+ <li>Contenedores, pruebas y rollback</li>
  <li>Comparativa de herramientas y métricas</li>
  </ul>
  </section>
@@ -827,10 +829,10 @@ Settings → Branches → Add rule → main
  </aside>
  </section>
 
- <!-- ═══════════ RECESO ═══════════ -->
+ <!-- ═══════════ Pausa ═══════════ -->
 
  <section class="chapter">
- <h2 data-kicker="A mitad de camino">Receso</h2>
+ <h2 data-kicker="A mitad de camino">Pausa</h2>
  <p class="nota">Volvemos con contenedores, pruebas y la comparativa de herramientas.</p>
  <aside class="notes">Duración sugerida: 10 minutos.</aside>
  </section>
@@ -910,10 +912,10 @@ Settings → Branches → Add rule → main
  </aside>
  </section>
 
- <!-- ═══════════ 6 · PRUEBAS Y REVERSIBILIDAD ═══════════ -->
+ <!-- ═══════════ 6 · PRUEBAS Y ROLLBACK ═══════════ -->
 
  <section class="chapter" data-num="06">
- <h2>6 · Pruebas y reversibilidad</h2>
+ <h2>6 · Pruebas y rollback</h2>
  <p class="nota">Cómo validar cuando la infraestructura no da para un ambiente espejo.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~10 minutos.</aside>
  </section>
@@ -942,7 +944,7 @@ Settings → Branches → Add rule → main
  </section>
 
  <section>
- <h2 data-kicker="Reversibilidad">Cómo se revierte, en la práctica</h2>
+ <h2 data-kicker="Rollback">Cómo se revierte, en la práctica</h2>
  <ul>
  <li><strong>Código</strong>: <code>git revert</code> deshace el commit con uno nuevo
  (ya visto en Git aplicado).</li>
@@ -985,7 +987,7 @@ Settings → Branches → Add rule → main
  </section>
 
  <section>
- <h2 data-kicker="Trivia">¡Trivia! Pruebas y reversibilidad</h2>
+ <h2 data-kicker="Trivia">¡Trivia! Pruebas y rollback</h2>
  <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
  <p class="nota" style="text-align:center;">La pregunta aparece ahí.</p>
  <aside class="notes">
@@ -1040,8 +1042,7 @@ Settings → Branches → Add rule → main
  <li><strong>AWS</strong>: CodePipeline / CodeBuild.</li>
  <li><strong>Azure</strong>: Azure Pipelines.</li>
  <li><strong>Google Cloud</strong>: Cloud Build.</li>
- <li><strong>Bitbucket</strong>: Bitbucket Pipelines. <strong>CircleCI</strong>:
- independiente de dónde viva el código.</li>
+ <li><strong>Bitbucket</strong>: Bitbucket Pipelines.</li>
  </ul>
  <p class="nota">El criterio no cambia: conviene la herramienta que ya vive donde vive
  el código y el resto de la infraestructura, no la que tiene más funciones.</p>
@@ -1194,8 +1195,7 @@ Settings → Branches → Add rule → main
 
  <section>
  <h2 data-kicker="Trivia · Resultados">¡Veamos quién ganó!</h2>
- <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Ranking final en Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
- <p class="nota" style="text-align:center;">Compartir la pantalla de resultados antes de cerrar la sesión.</p>
+ <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Ranking final en Mentimeter (menti.com)</p>
  <aside class="notes">
  Cambiar a la vista de leaderboard/resultados finales en Mentimeter.
  </aside>
