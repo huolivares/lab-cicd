@@ -5,73 +5,106 @@
  <meta name="viewport" content="width=device-width, initial-scale=1">
  <title>Integración y despliegue continuo</title>
 
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@500;600;700;800&amp;display=swap" rel="stylesheet">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/white.css">
  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
 <style>
 :root {
-  --tinta:#0E1A2B; --ambar:#E8871A; --gris:#7A8794; --fondo:#F3F5F8;
-  --blanco:#FFF; --linea:rgba(14,26,43,.11); --ambar-soft:rgba(232,135,26,.12);
+  --tinta:#0E1A2B; --ambar:#E8871A; --gris:#7A8794; --fondo:#F4F5F8; --blanco:#FFF;
+  --linea:rgba(14,26,43,.16);
+  --font-sans:'Inter','Segoe UI',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono','SFMono-Regular',Consolas,ui-monospace,monospace;
+  --radius:10px; --radius-sm:4px;
 }
 *{box-sizing:border-box}
-body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparent 25%),var(--fondo)}
-.reveal{font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--tinta);font-size:34px;background:transparent}
+html,body{background:var(--fondo)}
+.reveal{font-family:var(--font-sans);color:var(--tinta);font-size:34px;background:transparent;font-weight:450}
 .reveal .slides section{
-  text-align:left;padding:34px 54px;border-radius:28px;background:rgba(255,255,255,.96);
-  box-shadow:0 18px 55px rgba(14,26,43,.09);border:1px solid rgba(14,26,43,.06);overflow:hidden;
+  text-align:left;padding:58px 70px;border-radius:var(--radius);background:var(--blanco);
+  box-shadow:9px 9px 0 var(--ambar);overflow:hidden;
 }
-.reveal .slides section::before{content:"";position:absolute;left:0;top:0;width:9px;height:100%;background:var(--ambar)}
+.reveal .slides section::before,.reveal .slides section::after{
+  content:"";position:absolute;width:22px;height:22px;pointer-events:none;
+}
+.reveal .slides section::before{top:24px;left:24px;border-top:2.5px solid var(--tinta);border-left:2.5px solid var(--tinta)}
+.reveal .slides section::after{bottom:24px;right:24px;border-bottom:2.5px solid var(--tinta);border-right:2.5px solid var(--tinta)}
+.reveal .slides section.chapter::before,.reveal .slides section:first-child::before{border-top-color:var(--ambar);border-left-color:var(--ambar)}
+.reveal .slides section.chapter::after,.reveal .slides section:first-child::after{border-bottom-color:var(--ambar);border-right-color:var(--ambar)}
 .reveal .slides section:first-child{
   text-align:center;display:flex!important;flex-direction:column;justify-content:center;align-items:center;
-  background:radial-gradient(circle at 78% 22%,rgba(232,135,26,.22),transparent 24%),linear-gradient(135deg,#0E1A2B,#14243A);
-  color:white;border:0;box-shadow:0 24px 80px rgba(14,26,43,.28);
+  background:var(--tinta);color:white;
 }
 .reveal .slides section:first-child h1,.reveal .slides section:first-child h2{color:white;border:0}
-.reveal .slides section:first-child .nota{color:rgba(255,255,255,.72)}
-.reveal h1,.reveal h2,.reveal h3{font-family:Inter,"Segoe UI",system-ui,sans-serif;color:var(--tinta);text-transform:none;letter-spacing:-.035em;line-height:1.08;font-weight:800}
-.reveal h1{font-size:2.35em;max-width:950px;margin-bottom:.25em}
-.reveal h2{font-size:1.42em;display:block;border:0;padding:0 0 .42em;margin:0 0 .65em;position:relative}
-.reveal h2::after{content:"";position:absolute;left:0;bottom:0;width:62px;height:5px;border-radius:99px;background:var(--ambar)}
-.reveal .slides section:first-child h2::after,.reveal .slides section.chapter h2::after{display:block}
+.reveal .slides section:first-child .nota{color:rgba(255,255,255,.68)}
+.reveal h1,.reveal h2,.reveal h3{font-family:var(--font-sans);color:var(--tinta);text-transform:none;letter-spacing:-.032em;line-height:1.07;font-weight:800}
+.reveal h1{font-size:2.55em;max-width:940px;margin-bottom:.28em;font-weight:900}
+.reveal h2{font-size:1.5em;display:block;border:0;padding:0;margin:0 0 .78em}
+.reveal .slides section:not(:first-child) h2[data-kicker]::before{
+  content:attr(data-kicker);display:table;font-family:var(--font-mono);font-size:.32em;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ambar);font-weight:800;
+  border:1.5px solid var(--ambar);border-radius:var(--radius-sm);padding:.32em .65em;margin-bottom:.9em;
+}
 .reveal ul,.reveal ol{display:block;margin-left:.85em}
-.reveal li{margin-bottom:.42em;line-height:1.28}
+.reveal li{margin-bottom:.48em;line-height:1.32}
 .reveal li::marker{color:var(--ambar);font-weight:800}
-.reveal p{line-height:1.38}
-.reveal strong{font-weight:800}
-.reveal .nota{color:var(--gris);font-size:.70em}
+.reveal p{line-height:1.42}
+.reveal strong{font-weight:800;color:var(--tinta)}
+.reveal .nota{color:var(--gris);font-size:.70em;font-weight:500}
 .reveal .destacado{
-  background:linear-gradient(90deg,var(--ambar-soft),rgba(243,245,248,.65));
-  border:1px solid rgba(232,135,26,.22);border-left:5px solid var(--ambar);border-radius:14px;
-  padding:.65em .9em;text-align:left;font-size:.80em;margin-top:.65em;box-shadow:0 8px 25px rgba(14,26,43,.045)
+  background:var(--blanco);border:1.5px solid var(--tinta);border-left:4px solid var(--ambar);
+  border-radius:var(--radius-sm);padding:.85em 1.1em;text-align:left;font-size:.80em;margin-top:.7em;
+  box-shadow:5px 5px 0 var(--ambar);
 }
-.reveal code{font-family:"SFMono-Regular",Consolas,ui-monospace,monospace}
-.reveal pre{width:100%;box-shadow:0 16px 35px rgba(14,26,43,.12);margin:.55em 0;font-size:.44em;border-radius:14px;overflow:hidden}
-.reveal pre code{padding:1em 1.15em;max-height:520px;border-radius:14px;line-height:1.35}
-.reveal .pie-codigo{font-size:.67em;color:var(--gris);margin-top:.45em}
-.reveal table{border-collapse:separate;border-spacing:0;width:100%;border-radius:16px;border:1px solid var(--linea);box-shadow:0 12px 30px rgba(14,26,43,.07);background:white;overflow:hidden}
-.reveal th{background:var(--tinta);color:white;font-weight:700}
-.reveal td,.reveal th{padding:.65em .75em;border-bottom:1px solid var(--linea);border-right:1px solid var(--linea)}
-.reveal tr:last-child td{border-bottom:0}.reveal td:last-child,.reveal th:last-child{border-right:0}
-.marca{position:fixed;bottom:16px;left:22px;z-index:40;font-family:Inter,"Segoe UI",system-ui,sans-serif;font-size:11px;color:var(--gris);letter-spacing:2.5px;text-transform:uppercase;font-weight:700}
+.reveal code{font-family:var(--font-mono);font-weight:600}
+.reveal pre{
+  width:100%;margin:.8em 0 .6em;font-size:.44em;border-radius:var(--radius);overflow:hidden;
+  box-shadow:6px 6px 0 var(--tinta);background:#272822;position:relative;
+}
+.reveal pre[data-lang]{padding-top:2em}
+.reveal pre[data-lang]::before{
+  content:attr(data-lang);position:absolute;top:0;left:0;
+  background:var(--ambar);color:var(--tinta);font-family:var(--font-mono);font-weight:800;
+  font-size:.6em;letter-spacing:.08em;text-transform:uppercase;padding:.4em .8em;border-bottom-right-radius:7px;
+}
+.reveal .slides section pre code{padding:0 1.15em 1.1em;max-height:480px;border-radius:0;line-height:1.4;background:transparent!important;color:#ddd}
+.reveal .pie-codigo{font-size:.66em;color:var(--gris);margin-top:.5em;font-weight:500}
+.reveal table{border-collapse:collapse;width:100%;border-radius:var(--radius);border:1.5px solid var(--tinta);box-shadow:6px 6px 0 var(--ambar);background:var(--blanco);overflow:hidden}
+.reveal th{background:var(--tinta);color:white;font-weight:800;text-transform:uppercase;font-size:.76em;letter-spacing:.05em}
+.reveal td,.reveal th{padding:.75em .9em;border-bottom:1px solid var(--linea)}
+.reveal tr:last-child td{border-bottom:0}
+.reveal tr:nth-child(even) td{background:rgba(14,26,43,.03)}
+.marca{
+  position:fixed;bottom:20px;left:24px;z-index:40;font-family:var(--font-sans);font-size:11px;color:var(--tinta);
+  letter-spacing:2px;text-transform:uppercase;font-weight:700;background:var(--blanco);
+  padding:6px 12px 6px 8px;border-radius:var(--radius-sm);border:1.5px solid var(--tinta);box-shadow:3px 3px 0 var(--ambar);
+}
 .marca b{color:var(--tinta);font-weight:900}
-.version{position:fixed;bottom:16px;right:22px;z-index:40;font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;color:var(--gris);background:rgba(255,255,255,.75);padding:4px 8px;border-radius:999px;border:1px solid var(--linea)}
-.reveal .slides section:not(:first-child) h2::before{
-  content:attr(data-kicker);display:block;font-size:.38em;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--ambar);font-weight:900;margin-bottom:.55em
+.version{
+  position:fixed;bottom:20px;right:24px;z-index:40;font-family:var(--font-mono);font-size:11px;color:var(--tinta);
+  background:var(--blanco);padding:6px 12px;border-radius:var(--radius-sm);border:1.5px solid var(--tinta);box-shadow:3px 3px 0 var(--ambar);
 }
-.reveal .slides section.chapter{background:var(--tinta);color:white;display:flex!important;flex-direction:column;justify-content:center;border:0}
-.reveal .slides section.chapter::before{width:14px}
-.reveal .slides section.chapter h2{color:white;font-size:1.9em}
-.reveal .slides section.chapter .nota{color:rgba(255,255,255,.66)}
-.reveal .slides section.chapter h2::after{width:90px;height:6px}
-.flow-row{display:flex;align-items:center;justify-content:center;gap:.28em;margin-top:1.2em;flex-wrap:wrap}
-.flow-row .destacado{margin:0;text-align:center;min-width:135px;padding:.7em .8em;background:white;box-shadow:0 10px 24px rgba(14,26,43,.08);border-left-width:4px;font-weight:750}
-.flow-row .arrow{color:var(--ambar);font-weight:900;font-size:1.05em}
-.reveal .slides section code{color:var(--tinta);background:rgba(232,135,26,.10);padding:.06em .25em;border-radius:5px}
-.reveal .slides section pre code{background:#272822;color:#ddd}
+.reveal .slides section.chapter{
+  background:var(--tinta);color:white;display:flex!important;flex-direction:column;justify-content:center;border:0;
+}
+.reveal .slides section.chapter h2{color:white;font-size:2.15em;max-width:820px}
+.reveal .slides section.chapter .nota{color:rgba(255,255,255,.62);font-size:.55em;margin-top:.35em}
+.flow-row{display:flex;align-items:center;justify-content:center;gap:.5em;margin-top:1.25em;flex-wrap:wrap}
+.flow-row .destacado{
+  margin:0;text-align:center;min-width:128px;padding:.65em .9em;background:var(--blanco);
+  box-shadow:4px 4px 0 var(--ambar);border:1.5px solid var(--tinta);
+  border-radius:var(--radius-sm);font-weight:700;font-size:.9em;color:var(--tinta);
+}
+.flow-row .arrow{color:var(--ambar);font-weight:700;font-size:1.2em}
+.reveal .slides section code{color:var(--tinta);background:rgba(232,135,26,.14);padding:.07em .3em;border-radius:3px;font-size:.92em}
 .reveal .slides section a{color:var(--ambar);font-weight:700;text-decoration:none}
 .reveal .slides section a:hover{text-decoration:underline}
-@media(max-width:1000px){.reveal{font-size:28px}.reveal .slides section{padding:28px 38px;border-radius:22px}}
+.reveal .progress{height:4px;top:0;bottom:auto;background:rgba(14,26,43,.1)}
+.reveal .progress span{background:var(--ambar)}
+.reveal .controls{display:none}
+@media(max-width:1000px){.reveal{font-size:28px}.reveal .slides section{padding:40px 44px}}
 </style>
 
 </head>
@@ -91,14 +124,14 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
 
  <section>
  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="52" height="52" style="margin-bottom:.9em;"><g fill="none" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="square"><path d="M4 13V4h9"/><path d="M27 4h9v9"/><path d="M36 27v9h-9"/><path d="M13 36H4v-9"/></g><circle cx="20" cy="20" r="5.5" fill="#E8871A"/></svg>
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.18em;font-size:.52em;text-transform:uppercase;margin-bottom:1.5em;">Houston Lab</div>
+ <div style="font-family:var(--font-mono);color:var(--ambar);font-weight:700;letter-spacing:.18em;font-size:.5em;text-transform:uppercase;margin-bottom:1.6em;">Houston Lab</div>
  <h1>Integración y despliegue continuo</h1>
  <p class="nota">Sesión 1 · Fundamentos y criterio</p>
  <div style="margin-top:1.8em;display:flex;align-items:center;gap:.6em;">
- <div style="width:38px;height:38px;border-radius:999px;background:var(--ambar);color:var(--tinta);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;">HO</div>
+ <div style="width:40px;height:40px;border-radius:999px;background:var(--ambar);color:var(--tinta);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;box-shadow:0 10px 24px rgba(232,135,26,.4);">HO</div>
  <div style="text-align:left;">
  <div style="font-weight:800;font-size:20px;color:white;">Hugo Olivares</div>
- <div style="font-size:13px;color:rgba(255,255,255,.65);letter-spacing:.08em;text-transform:uppercase;">Technical Lead</div>
+ <div style="font-size:13px;color:rgba(255,255,255,.6);letter-spacing:.08em;text-transform:uppercase;font-weight:600;">Technical Lead</div>
  </div>
  </div>
  <aside class="notes">Bloque completo de apertura (presentación, problema de DevOps y caso Knight Capital): ~15 minutos.</aside>
@@ -109,12 +142,12 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <section>
  <h2 data-kicker="Antes de empezar">Trivia en vivo</h2>
  <p>A lo largo de la sesión van a aparecer momentos de trivia. Entren ahora a
- <strong>kahoot.it</strong> desde el celular: cuando aparezca el PIN en pantalla, lo
- escriben ahí. El más rápido en responder bien suma más puntos.</p>
+ <strong>menti.com</strong> desde el celular con el código <strong>3920 3047</strong>:
+ con eso quedan conectados para todas las preguntas de hoy.</p>
  <div style="display:flex;justify-content:center;margin-top:1em;">
- <img src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&amp;data=https://kahoot.it" width="170" height="170" alt="QR hacia kahoot.it" style="border-radius:12px;border:6px solid white;box-shadow:0 10px 30px rgba(14,26,43,.15);">
+ <img src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&amp;data=https://www.menti.com" width="170" height="170" alt="QR hacia menti.com" style="border-radius:12px;border:6px solid white;box-shadow:0 10px 30px rgba(14,26,43,.15);">
  </div>
- <p class="nota">Al final de la sesión mostramos el podio de ganadores.</p>
+ <p class="nota">Al final de cada bloque va a aparecer una pregunta: la responden ahí mismo, en Mentimeter.</p>
  </section>
 
  <!-- ═══════════ AGENDA ═══════════ -->
@@ -178,8 +211,7 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
  <p style="font-size:1.3em; margin:1em 0;">¿Qué pasa si mañana <strong>no están</strong>
  las personas que despliegan?</p>
  <aside class="notes">
- No responder. Dejar que hablen 2-3 minutos. Lo que digan es el resto de la sesión.
- No sermonear: el procedimiento actual funcionó mientras el volumen fue menor.
+ Pregunta para la audiencia.
  </aside>
  </section>
 
@@ -214,8 +246,7 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
 
  <!-- ═══════════ 1 · GIT APLICADO ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">01</div>
+ <section class="chapter" data-num="01">
  <h2>1 · Git aplicado</h2>
  <p class="nota">Ramas, commits y por qué la rama principal no se toca.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~18 minutos.</aside>
@@ -311,7 +342,7 @@ body{background:radial-gradient(circle at 85% 8%,rgba(232,135,26,.10),transparen
 
  <section>
  <h2 data-kicker="Git">Comandos que van a usar seguido</h2>
- <pre><code class="language-bash" data-trim>
+ <pre data-lang="bash"><code class="language-bash" data-trim>
 git checkout main
 git pull
 git checkout -b nombre-de-la-rama
@@ -326,7 +357,7 @@ git push -u origin nombre-de-la-rama
 
  <section>
  <h2 data-kicker="Git">Comandos para revertir</h2>
- <pre><code class="language-bash" data-trim>
+ <pre data-lang="bash"><code class="language-bash" data-trim>
 git log --oneline
 git revert &lt;hash&gt;
 git checkout -- archivo.js
@@ -362,7 +393,7 @@ git checkout -- archivo.js
 
  <section>
  <h2 data-kicker="Git">Un ejemplo</h2>
- <pre><code class="language-text" data-trim>
+ <pre data-lang="ejemplo"><code class="language-text" data-trim>
 ✗ fix
 ✗ cambios varios
 ✗ arreglo
@@ -377,9 +408,10 @@ git checkout -- archivo.js
 
  <section>
  <h2 data-kicker="Trivia">¡Trivia! Git aplicado</h2>
- <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Kahoot: la pregunta aparece ahí.</p>
+ <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
+ <p class="nota" style="text-align:center;">La pregunta aparece ahí.</p>
  <aside class="notes">
- Pregunta para el Kahoot: "¿Cuál de estos es el mejor mensaje de commit?"
+ Pregunta para Mentimeter: "¿Cuál de estos es el mejor mensaje de commit?"
  A) "fix" · B) "cambios varios" · C) "Corrige cálculo de IVA en boletas con descuento"
  Respuesta correcta: C.
  </aside>
@@ -387,8 +419,7 @@ git checkout -- archivo.js
 
  <!-- ═══════════ 2 · PULL REQUESTS ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">02</div>
+ <section class="chapter" data-num="02">
  <h2>2 · El pull request</h2>
  <p class="nota">Punto de control y, sobre todo, el gancho de toda la automatización.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~10 minutos.</aside>
@@ -417,7 +448,7 @@ git checkout -- archivo.js
 
  <section>
  <h2 data-kicker="Pull request">Así se ve un diff</h2>
- <pre><code class="language-diff" data-trim>
+ <pre data-lang="diff"><code class="language-diff" data-trim>
   function calcularTotal(items) {
 -   return items.reduce((a, b) => a + b.precio, 0);
 +   return items.reduce((a, b) => a + b.precio * b.cantidad, 0);
@@ -430,9 +461,10 @@ git checkout -- archivo.js
 
  <section>
  <h2 data-kicker="Trivia">¡Trivia! Pull request</h2>
- <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Kahoot: la pregunta aparece ahí.</p>
+ <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
+ <p class="nota" style="text-align:center;">La pregunta aparece ahí.</p>
  <aside class="notes">
- Pregunta para el Kahoot: "¿Cuál es el verdadero propósito de un pull request?"
+ Pregunta para Mentimeter: "¿Cuál es el verdadero propósito de un pull request?"
  A) Un respaldo del código · B) Una propuesta de cambio, y el lugar donde se conecta
  la verificación automática · C) Subir directo a producción
  Respuesta correcta: B.
@@ -441,8 +473,7 @@ git checkout -- archivo.js
 
  <!-- ═══════════ 3 · CI Y CD ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">03</div>
+ <section class="chapter" data-num="03">
  <h2>3 · Integración y despliegue continuo</h2>
  <p class="nota">Integración, entrega y despliegue continuo: tres pasos distintos, no sinónimos.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~11 minutos.</aside>
@@ -497,9 +528,10 @@ git checkout -- archivo.js
 
  <section>
  <h2 data-kicker="Trivia">¡Trivia! CI/CD</h2>
- <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Kahoot: la pregunta aparece ahí.</p>
+ <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
+ <p class="nota" style="text-align:center;">La pregunta aparece ahí.</p>
  <aside class="notes">
- Pregunta para el Kahoot: "El equipo automatiza solo la integración continua y sigue
+ Pregunta para Mentimeter: "El equipo automatiza solo la integración continua y sigue
  publicando a mano. ¿Ya sirvió de algo?"
  A) No, sin despliegue continuo no sirve de nada · B) Sí: da evidencia automática de
  que el código compila y pasa las pruebas en cada cambio · C) Solo sirve si además
@@ -510,8 +542,7 @@ git checkout -- archivo.js
 
  <!-- ═══════════ 4 · ANATOMÍA ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">04</div>
+ <section class="chapter" data-num="04">
  <h2>4 · Anatomía de un pipeline</h2>
  <p class="nota">El modelo que vamos a utilizar para entender el recorrido de un cambio.</p>
  <aside class="notes">Es el bloque más largo y técnico: ~28 minutos, incluida la trivia.</aside>
@@ -563,7 +594,7 @@ git checkout -- archivo.js
 
  <section>
  <h2 data-kicker="Pipeline">Un pipeline, en pseudocódigo</h2>
- <pre><code class="language-text" data-trim>
+ <pre data-lang="pseudocódigo"><code class="language-text" data-trim>
 al recibir un cambio:
   construir
   probar
@@ -616,7 +647,7 @@ al recibir un cambio:
 
  <section>
  <h2 data-kicker="Pipeline">Cuándo se dispara</h2>
- <pre><code class="language-yaml" data-trim data-noescape>
+ <pre data-lang="yaml"><code class="language-yaml" data-trim data-noescape>
 name: Verificar y publicar
 
 on:
@@ -632,7 +663,7 @@ on:
 
  <section>
  <h2 data-kicker="Pipeline">El trabajo de verificación</h2>
- <pre><code class="language-yaml" data-trim data-noescape>
+ <pre data-lang="yaml"><code class="language-yaml" data-trim data-noescape>
 jobs:
  verificar:
  runs-on: ubuntu-latest
@@ -669,7 +700,7 @@ jobs:
 
  <section>
  <h2 data-kicker="Pipeline">Publicar solo cuando corresponde</h2>
- <pre><code class="language-yaml" data-trim data-noescape>
+ <pre data-lang="yaml"><code class="language-yaml" data-trim data-noescape>
  publicar:
  needs: verificar
  if: github.event_name == 'push'
@@ -689,7 +720,7 @@ jobs:
 
  <section>
  <h2 data-kicker="Seguridad">Las credenciales no van en el código</h2>
- <pre><code class="language-yaml" data-trim data-noescape>
+ <pre data-lang="yaml"><code class="language-yaml" data-trim data-noescape>
  - name: Desplegar
  uses: FirebaseExtended/action-hosting-deploy@v0
  with:
@@ -750,7 +781,7 @@ jobs:
 
  <section>
  <h2 data-kicker="Gobernanza">Proteger la rama principal</h2>
- <pre><code class="language-text" data-trim>
+ <pre data-lang="configuración"><code class="language-text" data-trim>
 Settings → Branches → Add rule → main
 
  [x] Require a pull request before merging
@@ -787,9 +818,10 @@ Settings → Branches → Add rule → main
 
  <section>
  <h2 data-kicker="Trivia">¡Trivia! Anatomía de un pipeline</h2>
- <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Kahoot: la pregunta aparece ahí.</p>
+ <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
+ <p class="nota" style="text-align:center;">La pregunta aparece ahí.</p>
  <aside class="notes">
- Pregunta para el Kahoot: "¿Qué identifica con precisión exacta qué código se compiló?"
+ Pregunta para Mentimeter: "¿Qué identifica con precisión exacta qué código se compiló?"
  A) El nombre de la rama · B) El hash del commit · C) La fecha del build
  Respuesta correcta: B.
  </aside>
@@ -805,8 +837,7 @@ Settings → Branches → Add rule → main
 
  <!-- ═══════════ 5 · CONTENEDORES ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">05</div>
+ <section class="chapter" data-num="05">
  <h2>5 · Contenedores y registro de imágenes</h2>
  <p class="nota">El mismo artefacto, en todos lados: qué cambia al empaquetar el código.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~10 minutos.</aside>
@@ -855,7 +886,7 @@ Settings → Branches → Add rule → main
 
  <section>
  <h2 data-kicker="Contenedores">Cómo se ve en el pipeline</h2>
- <pre><code class="language-yaml" data-trim data-noescape>
+ <pre data-lang="yaml"><code class="language-yaml" data-trim data-noescape>
 - name: Construir imagen
  run: docker build -t registro/app:${{ github.sha }} .
 
@@ -869,9 +900,10 @@ Settings → Branches → Add rule → main
 
  <section>
  <h2 data-kicker="Trivia">¡Trivia! Contenedores</h2>
- <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Kahoot: la pregunta aparece ahí.</p>
+ <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
+ <p class="nota" style="text-align:center;">La pregunta aparece ahí.</p>
  <aside class="notes">
- Pregunta para el Kahoot: "¿Cuál es el beneficio real de empaquetar el código en una imagen?"
+ Pregunta para Mentimeter: "¿Cuál es el beneficio real de empaquetar el código en una imagen?"
  A) Es más rápido de compilar · B) Todos los servidores corren exactamente el mismo
  artefacto, sin copiarlo a mano uno por uno · C) Ahorra espacio en disco
  Respuesta correcta: B.
@@ -880,8 +912,7 @@ Settings → Branches → Add rule → main
 
  <!-- ═══════════ 6 · PRUEBAS Y REVERSIBILIDAD ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">06</div>
+ <section class="chapter" data-num="06">
  <h2>6 · Pruebas y reversibilidad</h2>
  <p class="nota">Cómo validar cuando la infraestructura no da para un ambiente espejo.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~10 minutos.</aside>
@@ -936,7 +967,7 @@ Settings → Branches → Add rule → main
  <p class="nota">Aplica igual aunque los cambios de base sigan siendo manuales.</p>
  <aside class="notes">
  Mantener esta sección breve. El objetivo es entender por qué la base de datos
- es un límite aparte, no enseñar migraciones.
+ es un límite aparte.
  </aside>
  </section>
 
@@ -955,9 +986,10 @@ Settings → Branches → Add rule → main
 
  <section>
  <h2 data-kicker="Trivia">¡Trivia! Pruebas y reversibilidad</h2>
- <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Kahoot: la pregunta aparece ahí.</p>
+ <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
+ <p class="nota" style="text-align:center;">La pregunta aparece ahí.</p>
  <aside class="notes">
- Pregunta para el Kahoot: "Si revierten una versión de código, ¿qué pasa con la base de datos?"
+ Pregunta para Mentimeter: "Si revierten una versión de código, ¿qué pasa con la base de datos?"
  A) Se revierte automáticamente junto con el código · B) No se revierte: el código
  nuevo debe poder funcionar también con el esquema viejo · C) Se borra
  Respuesta correcta: B.
@@ -966,8 +998,7 @@ Settings → Branches → Add rule → main
 
  <!-- ═══════════ 7 · HERRAMIENTAS ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">07</div>
+ <section class="chapter" data-num="07">
  <h2>7 · Comparativa de herramientas</h2>
  <p class="nota">Evaluadas contra sus criterios, no en abstracto.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~10 minutos.</aside>
@@ -1031,9 +1062,10 @@ Settings → Branches → Add rule → main
 
  <section>
  <h2 data-kicker="Trivia">¡Trivia! Herramientas</h2>
- <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Kahoot: la pregunta aparece ahí.</p>
+ <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
+ <p class="nota" style="text-align:center;">La pregunta aparece ahí.</p>
  <aside class="notes">
- Pregunta para el Kahoot: "¿Cuál suele ser la opción por defecto al elegir una herramienta de CI/CD?"
+ Pregunta para Mentimeter: "¿Cuál suele ser la opción por defecto al elegir una herramienta de CI/CD?"
  A) La que tenga más funciones · B) La del lugar donde ya vive el código · C) Siempre Jenkins
  Respuesta correcta: B.
  </aside>
@@ -1050,8 +1082,7 @@ Settings → Branches → Add rule → main
 
  <!-- ═══════════ 8 · MÉTRICAS ═══════════ -->
 
- <section class="chapter">
- <div style="font-family:monospace;color:var(--ambar);font-weight:900;letter-spacing:.12em;font-size:.65em;margin-bottom:1em;">08</div>
+ <section class="chapter" data-num="08">
  <h2>8 · Cómo se mide todo esto</h2>
  <ul>
  <li><strong>Frecuencia de despliegue</strong>: cada cuánto llega algo a producción.</li>
@@ -1079,13 +1110,14 @@ Settings → Branches → Add rule → main
 
  <section>
  <h2 data-kicker="Trivia">¡Trivia! Métricas</h2>
- <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Kahoot: la pregunta aparece ahí. Este es el último punto: mostramos el podio.</p>
+ <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Abran Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
+ <p class="nota" style="text-align:center;">La pregunta aparece ahí. Este es el último punto: revisamos los resultados.</p>
  <aside class="notes">
- Pregunta para el Kahoot: "¿Cuáles son las cuatro métricas que vimos?"
+ Pregunta para Mentimeter: "¿Cuáles son las cuatro métricas que vimos?"
  A) Líneas de código, commits por día, bugs abiertos, velocity · B) Frecuencia de
  despliegue, tiempo de entrega, tasa de fallos, tiempo de recuperación · C) Cobertura
  de pruebas, uptime, latencia, errores
- Respuesta correcta: B. Después de esta, mostrar el podio final de Kahoot.
+ Respuesta correcta: B. Después de esta, mostrar los resultados finales en Mentimeter.
  </aside>
  </section>
 
@@ -1116,11 +1148,13 @@ Settings → Branches → Add rule → main
  <ul>
  <li>Integración y despliegue continuo es, en la práctica, <strong>la puerta de
  entrada</strong> a DevOps: es lo que más rápido se implementa y lo que más se nota.</li>
- <li>Una vez que este flujo existe, el resto se apoya en él en vez de partir de cero:
- por ejemplo, <strong>monitoreo</strong> (saber si el sistema funciona ahora) y
- <strong>observabilidad</strong> (entender por qué, cuando algo falla) se agregan como
- pasos del mismo pipeline.</li>
- <li>Cada pieza nueva se suma sobre esta base, no en paralelo a ella.</li>
+ <li><strong>Monitoreo</strong> (saber si el sistema funciona ahora) y
+ <strong>observabilidad</strong> (entender por qué, cuando algo falla) no dependen de
+ tener CI/CD. Pero una vez que el pipeline existe, es más barato engancharlos ahí que
+ armarlos aparte: por ejemplo, un healthcheck automático después de cada deploy, o
+ taguear cada release con su versión para correlacionar incidentes.</li>
+ <li>Por eso el orden práctico suele ser: primero el pipeline, después las piezas que
+ se apoyan en él.</li>
  </ul>
  </section>
 
@@ -1146,10 +1180,7 @@ Settings → Branches → Add rule → main
  <li>Revisión entre pares · fusión, despliegue y reversión.</li>
  </ul>
  <aside class="notes">
- NO CERRAR SIN ESTO:
- · pedir los nombres de usuario de GitHub de cada participante
- · confirmar que asisten las mismas personas
- · confirmar que todos llegan con Git instalado
+ pedir los nombres de usuario de GitHub de cada participante
  </aside>
  </section>
 
@@ -1159,6 +1190,15 @@ Settings → Branches → Add rule → main
  <li>Su <strong>nombre de usuario de GitHub</strong></li>
  <li><strong>Git instalado</strong> en el computador con el que van a trabajar.</li>
  </ul>
+ </section>
+
+ <section>
+ <h2 data-kicker="Trivia · Resultados">¡Veamos quién ganó!</h2>
+ <p style="font-size:1.3em;text-align:center;margin:1.2em 0;">Ranking final en Mentimeter (menti.com) · Código <strong>3920 3047</strong></p>
+ <p class="nota" style="text-align:center;">Compartir la pantalla de resultados antes de cerrar la sesión.</p>
+ <aside class="notes">
+ Cambiar a la vista de leaderboard/resultados finales en Mentimeter.
+ </aside>
  </section>
 
  <section class="chapter">
