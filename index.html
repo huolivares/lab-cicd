@@ -160,7 +160,8 @@ html,body{background:var(--fondo)}
  <li>DevOps como marco, y por qué importa</li>
  <li>Git y pull request</li>
  <li>CI/CD y anatomía de un pipeline</li>
- <li>Contenedores, pruebas y rollback</li>
+ <li>Contenedores y registro de imágenes</li>
+ <li>Pruebas y rollback</li>
  <li>Comparativa de herramientas y métricas</li>
  </ul>
  </section>
@@ -306,8 +307,11 @@ html,body{background:var(--fondo)}
  </div>
  <div class="flow-row" style="margin-top:.6em;">
  <div class="destacado">main</div><span class="arrow">→</span>
- <div class="destacado">hotfix/*</div><span class="arrow">→</span>
- <div class="destacado">main + develop</div>
+ <div class="destacado">hotfix/*</div>
+ </div>
+ <div class="flow-row" style="margin-top:.3em;">
+ <span class="arrow">↳</span><div class="destacado">main</div>
+ <span class="arrow">↳</span><div class="destacado">develop</div>
  </div>
  <ul style="margin-top:1em;">
  <li><code>hotfix/*</code> es la excepción: sale de <code>main</code> y, al terminar,
@@ -351,10 +355,12 @@ git checkout -b nombre-de-la-rama
 git add archivo.js
 git commit -m "mensaje"
 git push -u origin nombre-de-la-rama
+git checkout nombre-de-la-rama &amp;&amp; git merge main
  </code></pre>
  <p class="pie-codigo">Actualizar main, crear la rama desde ahí, marcar el cambio,
- guardarlo, subirlo. Empezar siempre desde un <code>main</code> al día evita traer
- código viejo a la rama nueva.</p>
+ guardarlo, subirlo. La última línea trae a la rama los cambios que otras personas ya
+ fusionaron a <code>main</code> mientras tanto: conviene hacerlo seguido, así el
+ conflicto (si aparece) es chico y se resuelve ahí, no en el pull request.</p>
  </section>
 
  <section>
@@ -639,6 +645,10 @@ al recibir un cambio:
  <code>main</code></strong> que está publicado ahora mismo: lo genera el pipeline en
  cada build. Se puede comprobar: es el mismo hash que figura como último commit de
  <code>main</code> en GitHub.</p>
+ <p class="nota">Las próximas slides muestran los jobs <code>verificar</code> y
+ <code>publicar</code>, tal como están en <code>.github/workflows/deploy.yml</code>.
+ El archivo real tiene un tercer job, <code>vista-previa</code>, que no vemos acá:
+ lo revisamos completo en la próxima sesión.</p>
  <aside class="notes">
  Explicar conceptualmente dónde vive el pipeline y cómo se relaciona con el repositorio.
  Dejar la demostración operativa y la ejecución en vivo para la segunda sesión.
@@ -709,14 +719,20 @@ jobs:
  runs-on: ubuntu-latest
  steps:
  - uses: actions/checkout@v4
+ - uses: actions/setup-node@v4
  - name: Construir
  run: node build.mjs
  - name: Desplegar
- run: npx firebase deploy
+ uses: FirebaseExtended/action-hosting-deploy@v0
+ with:
+ firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT... }}
+ channelId: live
  </code></pre>
  <p class="pie-codigo"><code>needs</code> obliga a que la verificación pase primero.
  El <code>if</code> impide publicar desde una propuesta de cambio. Fusionar un pull
- request cuenta como <code>push</code>, así que sí dispara la publicación.</p>
+ request cuenta como <code>push</code>, así que sí dispara la publicación. Este es el
+ job <code>publicar</code> real de <code>.github/workflows/deploy.yml</code>, resumido
+ para que quepa en la slide.</p>
  </section>
 
  <section>
@@ -725,8 +741,8 @@ jobs:
  - name: Desplegar
  uses: FirebaseExtended/action-hosting-deploy@v0
  with:
- firebaseServiceAccount: ${{ secrets.SERVICE_ACCOUNT }}
- projectId: mi-proyecto
+ firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT... }}
+ projectId: ${{ env.FIREBASE_PROJECT }}
  channelId: live
  </code></pre>
  <ul>
@@ -840,7 +856,8 @@ Settings → Branches → Add rule → main
 
  <section class="chapter" data-num="05">
  <h2>5 · Contenedores y registro de imágenes</h2>
- <p class="nota">El mismo artefacto, en todos lados: qué cambia al empaquetar el código.</p>
+ <p class="nota">De compilar en cada servidor a construir una sola vez: qué gana el
+ equipo al empaquetar el código en una imagen.</p>
  <aside class="notes">Este bloque, incluida la trivia: ~10 minutos.</aside>
  </section>
 
@@ -975,11 +992,12 @@ Settings → Branches → Add rule → main
  <section>
  <h2 data-kicker="Alcance">También se puede versionar la base de datos</h2>
  <ul>
- <li>Herramientas como <strong>Flyway</strong> o <strong>Liquibase</strong> versionan los cambios
- de esquema igual que Git versiona el código.</li>
- <li>No reemplazan a Git: el código sigue viviendo ahí. Versionan algo distinto, el
- esquema de la base de datos, con su propio historial de cambios.</li>
- <li>Se ejecutan como un paso más del mismo pipeline, cuando el equipo esté listo.</li>
+ <li><strong>Flyway</strong> o <strong>Liquibase</strong>: cada cambio de esquema es un
+ script numerado. El objetivo es que cualquier ambiente llegue al mismo esquema,
+ aplicando los mismos scripts en el mismo orden, sin pasos manuales.</li>
+ <li>La herramienta guarda registro de qué scripts ya corrieron, para no repetirlos.</li>
+ <li>No reemplazan a Git: versionan el esquema, no el código. Se ejecutan como un paso
+ más del mismo pipeline, cuando el equipo esté listo.</li>
  </ul>
  <p class="nota">No es una decisión de hoy. Es una puerta que queda abierta para cuando la
  necesiten.</p>
@@ -1011,38 +1029,21 @@ Settings → Branches → Add rule → main
  <li><strong>Infraestructura</strong>: qué exige montar y mantener.</li>
  <li><strong>Costo</strong>: real, incluyendo el tiempo de quien lo administra.</li>
  <li><strong>Curva de aprendizaje</strong>: cuánto demora el equipo en ser autónomo.</li>
- <li><strong>Esfuerzo de migración</strong>: qué hay que mover de donde ya está.</li>
  </ul>
  </section>
 
  <section>
- <h2 data-kicker="Decisión">Las tres alternativas</h2>
- <table style="font-size:.62em">
- <tr>
- <th></th><th>GitHub Actions</th><th>GitLab CI/CD</th><th>Jenkins</th>
- </tr>
- <tr>
- <td>Infraestructura</td><td>Ninguna</td><td>Ninguna si es SaaS</td>
- <td>Servidor propio, siempre encendido</td>
- </tr>
- <tr>
- <td>Costo</td><td>Minutos incluidos</td><td>Minutos incluidos</td>
- <td>Licencia cero, mantención alta</td>
- </tr>
- <tr>
- <td>Curva</td><td>Baja</td><td>Baja</td><td>Alta: plugins y complementos</td>
- </tr>
+ <h2 data-kicker="Decisión">Las alternativas</h2>
+ <table style="font-size:.5em">
+ <tr><th>Herramienta</th><th>Infraestructura</th><th>Costo</th><th>Curva</th></tr>
+ <tr><td>GitHub Actions</td><td>Ninguna</td><td>Minutos incluidos</td><td>Baja</td></tr>
+ <tr><td>GitLab CI/CD</td><td>Ninguna si es SaaS</td><td>Minutos incluidos</td><td>Baja</td></tr>
+ <tr><td>Jenkins</td><td>Servidor propio, siempre encendido</td><td>Licencia cero, mantención alta</td><td>Alta: plugins</td></tr>
+ <tr><td>AWS CodePipeline</td><td>Ninguna (nube)</td><td>Pago por uso</td><td>Media</td></tr>
+ <tr><td>Azure Pipelines</td><td>Ninguna (nube)</td><td>Minutos incluidos</td><td>Media</td></tr>
+ <tr><td>Google Cloud Build</td><td>Ninguna (nube)</td><td>Pago por uso</td><td>Media</td></tr>
+ <tr><td>Bitbucket Pipelines</td><td>Ninguna (nube)</td><td>Minutos incluidos</td><td>Baja</td></tr>
  </table>
- </section>
-
- <section>
- <h2 data-kicker="Decisión">Otras opciones frecuentes</h2>
- <ul>
- <li><strong>AWS</strong>: CodePipeline / CodeBuild.</li>
- <li><strong>Azure</strong>: Azure Pipelines.</li>
- <li><strong>Google Cloud</strong>: Cloud Build.</li>
- <li><strong>Bitbucket</strong>: Bitbucket Pipelines.</li>
- </ul>
  <p class="nota">El criterio no cambia: conviene la herramienta que ya vive donde vive
  el código y el resto de la infraestructura, no la que tiene más funciones.</p>
  </section>
@@ -1160,8 +1161,9 @@ Settings → Branches → Add rule → main
 
  <section>
  <h2 data-kicker="Adopción">Por dónde empezar: el orden sugerido</h2>
- <p>Al automatizar varias aplicaciones, no se elige por importancia. Se ordena por
- <strong>riesgo bajo y aprendizaje alto</strong>:</p>
+ <p>Al automatizar varias aplicaciones, no se elige por importancia. Se empieza por la
+ que <strong>menos duele si algo sale mal</strong> y <strong>más rápido enseña</strong>
+ al equipo cómo se hace, y se deja la más importante para el final:</p>
  <ol>
  <li>La que <strong>cambia más seguido</strong>: paga el esfuerzo antes.</li>
  <li>La de <strong>menor impacto si falla</strong>: el equipo aprende sin costo.</li>
