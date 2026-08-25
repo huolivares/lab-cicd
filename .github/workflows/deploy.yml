@@ -9,7 +9,10 @@
 #                  y la comenta en el PR. El autor ve SU cambio antes de fusionar.
 #
 #   publicar       solo al fusionar en main. Va al sitio real.
-#                  Nadie sube archivos a mano, nunca.
+#                  Nadie sube archivos a mano, nunca. Los despliegues están
+#                  serializados (concurrency, más abajo): si dos personas
+#                  fusionan casi al mismo tiempo, el segundo deploy espera a
+#                  que termine el primero en vez de pisarlo.
 #
 # Configuración necesaria, una sola vez:
 #   1) firebase init hosting:github — ya hecho. Creó el secret
@@ -80,6 +83,9 @@ jobs:
     needs: verificar
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    concurrency:
+      group: publicar-produccion
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
 
