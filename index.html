@@ -732,12 +732,13 @@ jobs:
  steps:
  - uses: actions/checkout@v4
  - uses: google-github-actions/auth@v2
- - run: docker build -t $IMAGEN . &amp;&amp; docker push $IMAGEN
+ - run: docker build -t $IMAGEN:$SHA .
+ &amp;&amp; docker push $IMAGEN:$SHA
  - name: Desplegar
  uses: google-github-actions/deploy-cloudrun@v2
  with:
  service: lab-cicd
- image: ${{ env.IMAGEN }}
+ image: $IMAGEN:$SHA
  </code></pre>
  <p class="pie-codigo"><code>needs</code> obliga a que la verificación pase primero.
  El <code>if</code> impide publicar desde una propuesta de cambio. Fusionar un pull

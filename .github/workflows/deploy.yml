@@ -1,13 +1,9 @@
 # Pipeline del laboratorio
 # =================================
-# Tres etapas, porque enseñan cosas distintas:
+# Dos etapas, porque enseñan cosas distintas:
 #
 #   verificar      corre en CADA pull request y en cada push a main.
 #                  Si falla, GitHub bloquea la fusión. Es el "no" del sistema.
-#
-#   vista-previa   solo en pull requests. Publica el cambio en una revisión de
-#                  Cloud Run sin tráfico, con URL propia, y la comenta en el PR.
-#                  El autor ve SU cambio antes de fusionar.
 #
 #   publicar       solo al fusionar en main. Va al sitio real.
 #                  Nadie sube archivos a mano, nunca. Los despliegues están
@@ -15,14 +11,14 @@
 #                  fusionan casi al mismo tiempo, el segundo deploy espera a
 #                  que termine el primero en vez de pisarlo.
 #
-# build-once, promote: la etiqueta de la imagen sale de un hash del contenido
-# (Dockerfile + index.html + build.mjs + package.json), no del commit. Si esa
-# etiqueta ya existe en Artifact Registry —porque la PR ya la construyó en
-# vista-previa—, publicar NO vuelve a correr "docker build": solo despliega
-# esa misma imagen. Así lo que se probó en la vista previa es, byte a byte,
-# lo que llega a producción. Sin esto, dos "docker build" del mismo código en
-# momentos distintos podrían traer una versión más nueva de node:20-alpine o
-# nginx:alpine y terminar publicando algo que nadie probó.
+# La imagen se construye una sola vez, al fusionar, etiquetada con el hash
+# del commit — la misma idea que el marcador de versión de la presentación
+# y que revertir con "git revert": un solo identificador para "qué código es
+# este" en todo el pipeline. Por eso no hay un job de vista previa aparte
+# desplegando su propia imagen: evita el problema de tener dos "docker build"
+# del mismo cambio en momentos distintos, que podrían traer una versión más
+# nueva de node:20-alpine o nginx:alpine y terminar publicando algo que nadie
+# probó exactamente igual.
 #
 # Configuración necesaria, una sola vez (ver README, sección "Configuración
 # en Google Cloud"): repositorio en Artifact Registry, servicio de Cloud Run,
@@ -60,65 +56,6 @@ jobs:
       - name: Validar la presentación
         run: node test/validar.mjs
 
-  vista-previa:
-    name: Vista previa del cambio
-    needs: verificar
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      id-token: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - id: tag
-        name: Calcular la etiqueta de la imagen (hash del contenido)
-        run: echo "valor=$(cat Dockerfile index.html build.mjs package.json | sha256sum | cut -c1-12)" >> "$GITHUB_OUTPUT"
-
-      - id: auth
-        name: Autenticarse en Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-
-      - uses: google-github-actions/setup-gcloud@v2
-
-      - name: Autenticar Docker con Artifact Registry
-        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
-
-      - name: Construir y subir la imagen (si el contenido no existe ya)
-        run: |
-          TAG=${{ steps.tag.outputs.valor }}
-          if gcloud artifacts docker images describe "${{ env.IMAGEN }}:$TAG" --project "${{ env.GCP_PROJECT }}" &>/dev/null; then
-            echo "Ya existe una imagen para este contenido — no se reconstruye."
-          else
-            docker build --build-arg GITHUB_SHA=${{ github.sha }} -t ${{ env.IMAGEN }}:$TAG .
-            docker push ${{ env.IMAGEN }}:$TAG
-          fi
-
-      - name: Publicar en una URL temporal
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v2
-        with:
-          service: ${{ env.SERVICIO }}
-          region: ${{ env.GCP_REGION }}
-          image: ${{ env.IMAGEN }}:${{ steps.tag.outputs.valor }}
-          tag: pr-${{ github.event.pull_request.number }}
-          no_traffic: true
-
-      - name: Comentar la URL en el pull request
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `Vista previa desplegada: ${{ steps.deploy.outputs.url }}`,
-            })
-
   publicar:
     name: Publicar
     needs: verificar
@@ -133,10 +70,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - id: tag
-        name: Calcular la etiqueta de la imagen (hash del contenido)
-        run: echo "valor=$(cat Dockerfile index.html build.mjs package.json | sha256sum | cut -c1-12)" >> "$GITHUB_OUTPUT"
-
       - id: auth
         name: Autenticarse en Google Cloud
         uses: google-github-actions/auth@v2
@@ -149,19 +82,14 @@ jobs:
       - name: Autenticar Docker con Artifact Registry
         run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
-      - name: Construir y subir la imagen (solo si la vista previa no la construyó ya)
+      - name: Construir y subir la imagen
         run: |
-          TAG=${{ steps.tag.outputs.valor }}
-          if gcloud artifacts docker images describe "${{ env.IMAGEN }}:$TAG" --project "${{ env.GCP_PROJECT }}" &>/dev/null; then
-            echo "Ya existe una imagen para este contenido — se promueve tal cual, sin reconstruir."
-          else
-            docker build --build-arg GITHUB_SHA=${{ github.sha }} -t ${{ env.IMAGEN }}:$TAG .
-            docker push ${{ env.IMAGEN }}:$TAG
-          fi
+          docker build --build-arg GITHUB_SHA=${{ github.sha }} -t ${{ env.IMAGEN }}:${{ github.sha }} .
+          docker push ${{ env.IMAGEN }}:${{ github.sha }}
 
       - name: Publicar en el sitio real
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICIO }}
           region: ${{ env.GCP_REGION }}
-          image: ${{ env.IMAGEN }}:${{ steps.tag.outputs.valor }}
+          image: ${{ env.IMAGEN }}:${{ github.sha }}

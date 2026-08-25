@@ -18,9 +18,8 @@ Para verla en local: `node build.mjs && open dist/index.html`, o con Docker:
 ## Cómo funciona
 
 ```
-  rama  →  pull request  →  verificar  →  vista previa  →  fusionar  →  publicar
-                               │              │
-                               │              └─ URL temporal, comentada en el PR
+  rama  →  pull request  →  verificar  →  fusionar  →  publicar
+                               │
                                └─ si falla, la fusión queda bloqueada
 ```
 
@@ -28,20 +27,19 @@ Para verla en local: `node build.mjs && open dist/index.html`, o con Docker:
 |---|---|---|
 | **Construir** | `build.mjs` genera `dist/` e inyecta el hash del commit en la esquina de la pantalla — corre dentro de la imagen, en la primera etapa del `Dockerfile` | en cada cambio |
 | **Verificar** | `test/validar.mjs` revisa las slides. Si algo no cumple, termina con error | en cada pull request y push a `main` |
-| **Vista previa** | calcula una etiqueta a partir del contenido (no del commit), construye y sube la imagen a Artifact Registry si no existe ya, y despliega una revisión de Cloud Run sin tráfico con URL propia comentada en el PR | solo en pull requests |
-| **Publicar** | calcula la misma etiqueta; si la vista previa ya construyó esa imagen, no la reconstruye — solo la despliega tal cual, byte a byte, con el 100% del tráfico | solo al fusionar en `main` |
+| **Publicar** | construye la imagen, la etiqueta con el hash del commit, la sube a Artifact Registry y mueve el 100% del tráfico del servicio de Cloud Run a esa revisión | solo al fusionar en `main` |
 
 El número abajo a la derecha de la presentación es **la versión publicada**.
-Al revertir un cambio, ese número cambia a la vista de todos.
+Al revertir un cambio, ese número cambia a la vista de todos — el mismo hash de
+commit identifica la versión en la pantalla, en la imagen de Docker y en el
+historial de git: una sola idea de "qué versión es esta" en todo el pipeline.
 
-**Por qué la etiqueta de la imagen es un hash y no el commit:** el commit de fusión
-que crea GitHub al aceptar un PR no es el mismo commit que ya construyó `vista-previa`.
-Si `publicar` reconstruyera con ese SHA distinto, `docker build` podría traer una
-versión más nueva de `node:20-alpine` o `nginx:alpine` que la usada en la vista previa
-— lo que se probó dejaría de ser exactamente lo que se publica. Etiquetar por el hash
-del contenido real (`Dockerfile` + `index.html` + `build.mjs` + `package.json`) hace
-que, si nada de eso cambió entre la vista previa y la fusión, `publicar` reconozca que
-la imagen ya existe y la reutilice en vez de reconstruir.
+No hay un job de vista previa desplegando una URL aparte por cada pull request:
+la imagen se construye una única vez, al fusionar. Evita el problema de tener dos
+`docker build` del mismo cambio en momentos distintos — uno en la vista previa, otro
+al fusionar —, que podrían traer una versión más nueva de `node:20-alpine` o
+`nginx:alpine` cada vez y terminar publicando algo ligeramente distinto de lo que
+alguien alcanzó a revisar.
 
 ## Trabajar localmente
 
@@ -136,9 +134,7 @@ Sin esto el pipeline avisa, pero no impide fusionar. Activarlo recién cuando el
 contenido esté listo: mientras se escribe, obliga a hacer un PR por cada cambio.
 
 **Participantes** — `Settings → Collaborators`, permiso **Write**. Sin eso no pueden
-crear ramas. Las vistas previas no funcionan en PRs desde un *fork*, porque los forks
-no tienen acceso a los secrets: los participantes trabajan como colaboradores del
-repositorio, no desde forks.
+crear ramas.
 
 ## Alcance
 
