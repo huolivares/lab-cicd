@@ -84,6 +84,31 @@ crear ramas. Las vistas previas no funcionan en PRs desde un *fork*, porque los 
 no tienen acceso a los secrets: los participantes trabajan como colaboradores del
 repositorio, no desde forks.
 
+## Variante con Docker
+
+El sitio real se publica con Firebase Hosting (arriba), pero el repo incluye una
+segunda vía, pensada para equipos que ya trabajan con `docker compose` en local y en
+el servidor de prod:
+
+```bash
+docker compose up --build   # http://localhost:8080
+```
+
+El `Dockerfile` corre el mismo `build.mjs` en una etapa con Node, y copia el
+resultado a una imagen final de nginx que no lleva ni Node ni el código fuente.
+
+`.github/workflows/docker.yml` hace el mismo "construir → publicar" que
+`deploy.yml`, pero el artefacto es esa imagen en vez de archivos sueltos: en cada
+pull request la construye para confirmar que el `Dockerfile` sigue sano, y al
+fusionar en `main` la publica en GitHub Container Registry
+(`ghcr.io/<owner>/<repo>:latest` y `:<sha>`), usando el `GITHUB_TOKEN` que ya trae
+el repo — sin secrets nuevos.
+
+Lo que ese workflow **no** hace es el último paso: desplegar la imagen a un servidor
+de prod. Eso depende de la infraestructura de cada equipo — típicamente un job extra
+que se conecta por SSH y corre `docker compose pull && docker compose up -d` con la
+imagen recién publicada.
+
 ## Alcance
 
 El repositorio queda con el equipo como espacio de práctica y plantilla de referencia.

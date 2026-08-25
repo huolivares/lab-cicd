@@ -1,0 +1,15 @@
+# docker-compose.yml — levantar la imagen en local, igual que se levantaría
+# en un servidor de prod que trabaja con compose.
+#
+#   docker compose up --build
+#   abrir http://localhost:8080
+#
+# Es el equivalente en Docker de la etapa "vista previa" del pipeline: ver el
+# artefacto corriendo antes de publicarlo, solo que acá corre en tu máquina
+# en vez de en una URL temporal de Firebase.
+
+services:
+  sitio:
+    build: .
+    ports:
+      - "8080:80"
