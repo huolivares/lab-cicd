@@ -1219,6 +1219,223 @@ Settings → Branches → Add rule → main
  <h2 data-kicker="Fin de la sesión">Gracias</h2>
  </section>
 
+ <!-- ═══════════ SESIÓN 2 · LABORATORIO ═══════════ -->
+
+ <section class="chapter">
+ <h2>Sesión 2 — Laboratorio</h2>
+ <p class="nota">Práctica guiada sobre un repositorio con pipeline real, con todos
+ los participantes ejecutando. Ningún ejercicio toca sistemas productivos ni
+ requiere credenciales.</p>
+ <aside class="notes">
+ Apertura de la Sesión 2. Repasar en dos frases el flujo visto en la Sesión 1
+ (rama → PR → verificación → fusión → publicación) antes de empezar a ejecutarlo en vivo.
+ </aside>
+ </section>
+
+ <section>
+ <h2 data-kicker="Sesión 2">Los seis bloques de hoy</h2>
+ <ol>
+ <li>Rama de trabajo</li>
+ <li>Primer pull request</li>
+ <li>Verificación automática</li>
+ <li>Rechazo controlado</li>
+ <li>Revisión entre pares</li>
+ <li>Fusión, despliegue y reversión</li>
+ </ol>
+ <p class="nota">Todos ejecutan, en paralelo, sobre su propia rama.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Sesión 2">Antes de empezar</h2>
+ <ul>
+ <li>Usuario de <strong>GitHub</strong> con acceso de colaborador al repositorio.</li>
+ <li><strong>Git</strong> instalado en el computador con el que van a trabajar.</li>
+ <li>URL del repositorio: <code>github.com/huolivares/lab-cicd</code></li>
+ </ul>
+ <p class="nota">Si a alguien le falta algo de esto, es el momento de resolverlo: el
+ resto del laboratorio asume que ya están listos.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Bloque 1">Rama de trabajo</h2>
+ <p>Clonen el repositorio, creen su rama y completen su propia slide, al
+ final de este deck.</p>
+ <pre data-lang="bash"><code class="language-bash" data-trim>
+git clone https://github.com/huolivares/lab-cicd.git
+cd lab-cicd
+git checkout -b tu-usuario/practica
+git add index.html
+git commit -m "mensaje útil"
+git push -u origin tu-usuario/practica
+ </code></pre>
+ <p class="pie-codigo">El mensaje del commit explica qué problema resuelve el
+ cambio, no describe el archivo: la misma regla que ya vimos en la Sesión 1.</p>
+ <aside class="notes">
+ Circular entre las mesas mientras cada uno clona, crea la rama y hace su
+ primer commit. El cambio real es completar su propia tarjeta, al final del
+ deck: Fanny, Dylan, Gabriel, Richard, Juan y Pablo ya tienen la suya con texto
+ de relleno para reemplazar.
+ </aside>
+ </section>
+
+ <section>
+ <h2 data-kicker="Bloque 2">Primer pull request</h2>
+ <p>Abran la propuesta de cambio en GitHub y lean el diff antes de crearla.</p>
+ <pre data-lang="github"><code class="language-text" data-trim>
+GitHub → Pull requests → New pull request
+base: main   ←   compare: tu-usuario/practica
+Revisar el diff → Create pull request
+ </code></pre>
+ <p class="pie-codigo">El diff se ve igual que en la Sesión 1: rojo lo que sale,
+ verde lo que entra.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Bloque 3">Verificación automática</h2>
+ <p>Abran la pestaña Checks de su pull request y sigan el job Verificar en vivo.</p>
+ <pre data-lang="github"><code class="language-text" data-trim>
+Pull request → pestaña Checks
+job Verificar: checkout → construir → validar
+ </code></pre>
+ <p class="pie-codigo">Los mismos dos comandos corren en su máquina con
+ <code>npm run verificar</code>: <code>build.mjs</code> y <code>test/validar.mjs</code>.</p>
+ <aside class="notes">
+ Apenas se abre el pull request, el pipeline construye y prueba el cambio, en
+ vivo y a la vista de todos. Ir señalando cada paso del job mientras corre:
+ checkout, construir, validar.
+ </aside>
+ </section>
+
+ <section>
+ <h2 data-kicker="Bloque 4">Rechazo controlado</h2>
+ <p>Un voluntario borra el <code>&lt;h2&gt;</code> de su propia slide y sube
+ el cambio. El resto observa.</p>
+ <pre data-lang="bash"><code class="language-bash" data-trim>
+git add index.html
+git commit -m "prueba de rechazo"
+git push
+ </code></pre>
+ <p class="pie-codigo">El job <strong>Verificar</strong> se pone en rojo y GitHub
+ bloquea la fusión: es la regla "todas las slides tienen título" de
+ <code>test/validar.mjs</code>.</p>
+ <aside class="notes">
+ Un solo voluntario, no todo el grupo: el objetivo es ver al sistema decir que
+ no, sin llenar el repositorio de pull requests rotos. Se hace sobre el mismo
+ PR que ya abrieron en el bloque 2, con un commit nuevo.
+ </aside>
+ </section>
+
+ <section>
+ <h2 data-kicker="Bloque 4">Diagnóstico y corrección</h2>
+ <p>El mismo voluntario proyecta su pantalla, lee el log del paso que falló y corrige.</p>
+ <pre data-lang="bash"><code class="language-bash" data-trim>
+git add index.html
+git commit -m "corrige el rechazo"
+git push
+ </code></pre>
+ <p class="pie-codigo">Antes: en la pestaña Checks, abrir <strong>Verificar</strong> y
+ leer qué línea del log dice el error, y devolver el <code>&lt;h2&gt;</code> a
+ la slide. El pipeline vuelve a correr solo, sin que nadie lo dispare a mano.</p>
+ <aside class="notes">
+ Que proyecte quien rompió el pipeline: es su error y su diagnóstico, y así el
+ grupo lo ve una vez completo en vez de repetirlo cinco veces. Si nadie puede
+ compartir pantalla, lo conduce el relator.
+ </aside>
+ </section>
+
+ <section>
+ <h2 data-kicker="Bloque 5">Revisión entre pares</h2>
+ <p>Uno de ustedes proyecta y revisa el pull request de un compañero: comenta
+ líneas específicas del diff.</p>
+ <pre data-lang="github"><code class="language-text" data-trim>
+Pull requests → PR de un compañero → Files changed
+pasar el mouse sobre una línea → "+" → comentar
+Review changes → Comment
+ </code></pre>
+ <p class="pie-codigo">Se comenta la línea, no se aprueba en bloque: la misma
+ idea de revisión que ya vimos en la Sesión 1.</p>
+ <aside class="notes">
+ Con una persona proyectando alcanza para que todos vean la mecánica. Si el
+ tiempo da, cada uno repite después en su propio PR, sin proyectar.
+ </aside>
+ </section>
+
+ <section>
+ <h2 data-kicker="Bloque 6">Fusión y despliegue</h2>
+ <p>Fusionen su pull request y abran la pestaña Actions.</p>
+ <pre data-lang="github"><code class="language-text" data-trim>
+Pull request → Merge pull request
+Actions → job publicar → Publicar en el sitio real
+ </code></pre>
+ <p class="pie-codigo">Es el mismo push a <code>main</code> que ya vimos en la
+ Sesión 1: fusionar el PR ya dispara la publicación.</p>
+ <aside class="notes">
+ Al fusionar, el job publicar corre solo: el cambio queda publicado sin que
+ nadie suba nada a mano. Señalar el job en Actions mientras corre.
+ Si varios fusionan casi al mismo tiempo: cada push dispara su propio job
+ publicar, pero quedan serializados (concurrency en deploy.yml) — el segundo
+ espera a que termine el primero, no lo pisa. Buen momento para mostrarlo si
+ pasa en vivo.
+ </aside>
+ </section>
+
+ <section>
+ <h2 data-kicker="Bloque 6">Reversión</h2>
+ <p>Reviertan su propio commit y publiquen de nuevo.</p>
+ <pre data-lang="bash"><code class="language-bash" data-trim>
+git log --oneline
+git revert &lt;hash&gt;
+git push
+ </code></pre>
+ <p class="pie-codigo">El pipeline vuelve a correr y republica la versión
+ anterior. El número abajo a la derecha de la pantalla cambia: así se comprueba
+ que la reversión se hizo.</p>
+ <aside class="notes">
+ Volver a la versión anterior toma menos de un minuto: dos comandos, sin tocar
+ ninguna consola ni pedir acceso a nadie. No hay un pipeline aparte para
+ revertir ni contenedores de por medio: es el mismo pipeline (verificar +
+ publicar) corriendo de nuevo, sobre un commit que deshace el cambio.
+ </aside>
+ </section>
+
+ <!-- ═══════════ TARJETAS DE LOS PARTICIPANTES ═══════════ -->
+
+ <section>
+ <h2 data-kicker="Es tu turno">Fanny</h2>
+ <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
+ <p class="nota">Algo entretenido de mí: completar acá.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Es tu turno">Dylan</h2>
+ <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
+ <p class="nota">Algo entretenido de mí: completar acá.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Es tu turno">Gabriel</h2>
+ <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
+ <p class="nota">Algo entretenido de mí: completar acá.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Es tu turno">Richard</h2>
+ <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
+ <p class="nota">Algo entretenido de mí: completar acá.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Es tu turno">Juan</h2>
+ <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
+ <p class="nota">Algo entretenido de mí: completar acá.</p>
+ </section>
+
+ <section>
+ <h2 data-kicker="Es tu turno">Pablo</h2>
+ <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
+ <p class="nota">Algo entretenido de mí: completar acá.</p>
+ </section>
+
  </div>
  </div>
 
