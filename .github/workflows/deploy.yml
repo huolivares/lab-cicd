@@ -5,8 +5,9 @@
 #   verificar      corre en CADA pull request y en cada push a main.
 #                  Si falla, GitHub bloquea la fusión. Es el "no" del sistema.
 #
-#   vista-previa   solo en pull requests. Publica el cambio en una URL temporal
-#                  y la comenta en el PR. El autor ve SU cambio antes de fusionar.
+#   vista-previa   solo en pull requests. Publica el cambio en una revisión de
+#                  Cloud Run sin tráfico, con URL propia, y la comenta en el PR.
+#                  El autor ve SU cambio antes de fusionar.
 #
 #   publicar       solo al fusionar en main. Va al sitio real.
 #                  Nadie sube archivos a mano, nunca. Los despliegues están
@@ -14,14 +15,13 @@
 #                  fusionan casi al mismo tiempo, el segundo deploy espera a
 #                  que termine el primero en vez de pisarlo.
 #
-# Configuración necesaria, una sola vez:
-#   1) firebase init hosting:github — ya hecho. Creó el secret
-#      FIREBASE_SERVICE_ACCOUNT_HOUSTON_LAB_ECAFD y un workflow propio que
-#      se eliminó: desplegaba dist/ sin construirlo antes.
-#   2) Settings → Branches → Add rule → main
-#        · Require a pull request before merging
-#        · Require status checks to pass → Verificar
-#      (activar recién cuando el contenido esté listo)
+# El artefacto que se construye y publica es la imagen de Dockerfile: mismo
+# build.mjs de siempre, empaquetado con nginx.
+#
+# Configuración necesaria, una sola vez (ver README, sección "Configuración
+# en Google Cloud"): repositorio en Artifact Registry, servicio de Cloud Run,
+# cuenta de servicio con permisos mínimos, y Workload Identity Federation
+# para que este workflow se autentique sin guardar ninguna llave.
 
 name: Verificar y publicar
 
@@ -32,7 +32,10 @@ on:
     branches: [main]
 
 env:
-  FIREBASE_PROJECT: houston-lab-ecafd
+  GCP_PROJECT: TU_PROYECTO_GCP
+  GCP_REGION: southamerica-west1
+  SERVICIO: lab-cicd
+  IMAGEN: southamerica-west1-docker.pkg.dev/TU_PROYECTO_GCP/lab-cicd/sitio
 
 jobs:
   verificar:
@@ -57,26 +60,51 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
-      checks: write
       contents: read
       pull-requests: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - id: auth
+        name: Autenticarse en Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          node-version: '20'
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
-      - name: Construir
-        run: node build.mjs
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Autenticar Docker con Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Construir y subir la imagen
+        run: |
+          docker build \
+            --build-arg GITHUB_SHA=${{ github.sha }} \
+            -t ${{ env.IMAGEN }}:pr-${{ github.event.pull_request.number }} .
+          docker push ${{ env.IMAGEN }}:pr-${{ github.event.pull_request.number }}
 
       - name: Publicar en una URL temporal
-        uses: FirebaseExtended/action-hosting-deploy@v0
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_HOUSTON_LAB_ECAFD }}
-          projectId: ${{ env.FIREBASE_PROJECT }}
-          expires: 7d
+          service: ${{ env.SERVICIO }}
+          region: ${{ env.GCP_REGION }}
+          image: ${{ env.IMAGEN }}:pr-${{ github.event.pull_request.number }}
+          tag: pr-${{ github.event.pull_request.number }}
+          no_traffic: true
+
+      - name: Comentar la URL en el pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Vista previa desplegada: ${{ steps.deploy.outputs.url }}`,
+            })
 
   publicar:
     name: Publicar
@@ -86,20 +114,36 @@ jobs:
     concurrency:
       group: publicar-produccion
       cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - id: auth
+        name: Autenticarse en Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          node-version: '20'
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
-      - name: Construir
-        run: node build.mjs
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Autenticar Docker con Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Construir y subir la imagen
+        run: |
+          docker build \
+            --build-arg GITHUB_SHA=${{ github.sha }} \
+            -t ${{ env.IMAGEN }}:${{ github.sha }} \
+            -t ${{ env.IMAGEN }}:latest .
+          docker push ${{ env.IMAGEN }}:${{ github.sha }}
+          docker push ${{ env.IMAGEN }}:latest
 
       - name: Publicar en el sitio real
-        uses: FirebaseExtended/action-hosting-deploy@v0
+        uses: google-github-actions/deploy-cloudrun@v2
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_HOUSTON_LAB_ECAFD }}
-          projectId: ${{ env.FIREBASE_PROJECT }}
-          channelId: live
+          service: ${{ env.SERVICIO }}
+          region: ${{ env.GCP_REGION }}
+          image: ${{ env.IMAGEN }}:${{ github.sha }}
