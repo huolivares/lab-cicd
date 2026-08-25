@@ -15,8 +15,14 @@
 #                  fusionan casi al mismo tiempo, el segundo deploy espera a
 #                  que termine el primero en vez de pisarlo.
 #
-# El artefacto que se construye y publica es la imagen de Dockerfile: mismo
-# build.mjs de siempre, empaquetado con nginx.
+# build-once, promote: la etiqueta de la imagen sale de un hash del contenido
+# (Dockerfile + index.html + build.mjs + package.json), no del commit. Si esa
+# etiqueta ya existe en Artifact Registry —porque la PR ya la construyó en
+# vista-previa—, publicar NO vuelve a correr "docker build": solo despliega
+# esa misma imagen. Así lo que se probó en la vista previa es, byte a byte,
+# lo que llega a producción. Sin esto, dos "docker build" del mismo código en
+# momentos distintos podrían traer una versión más nueva de node:20-alpine o
+# nginx:alpine y terminar publicando algo que nadie probó.
 #
 # Configuración necesaria, una sola vez (ver README, sección "Configuración
 # en Google Cloud"): repositorio en Artifact Registry, servicio de Cloud Run,
@@ -66,6 +72,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - id: tag
+        name: Calcular la etiqueta de la imagen (hash del contenido)
+        run: echo "valor=$(cat Dockerfile index.html build.mjs package.json | sha256sum | cut -c1-12)" >> "$GITHUB_OUTPUT"
+
       - id: auth
         name: Autenticarse en Google Cloud
         uses: google-github-actions/auth@v2
@@ -78,12 +88,15 @@ jobs:
       - name: Autenticar Docker con Artifact Registry
         run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
-      - name: Construir y subir la imagen
+      - name: Construir y subir la imagen (si el contenido no existe ya)
         run: |
-          docker build \
-            --build-arg GITHUB_SHA=${{ github.sha }} \
-            -t ${{ env.IMAGEN }}:pr-${{ github.event.pull_request.number }} .
-          docker push ${{ env.IMAGEN }}:pr-${{ github.event.pull_request.number }}
+          TAG=${{ steps.tag.outputs.valor }}
+          if gcloud artifacts docker images describe "${{ env.IMAGEN }}:$TAG" --project "${{ env.GCP_PROJECT }}" &>/dev/null; then
+            echo "Ya existe una imagen para este contenido — no se reconstruye."
+          else
+            docker build --build-arg GITHUB_SHA=${{ github.sha }} -t ${{ env.IMAGEN }}:$TAG .
+            docker push ${{ env.IMAGEN }}:$TAG
+          fi
 
       - name: Publicar en una URL temporal
         id: deploy
@@ -91,7 +104,7 @@ jobs:
         with:
           service: ${{ env.SERVICIO }}
           region: ${{ env.GCP_REGION }}
-          image: ${{ env.IMAGEN }}:pr-${{ github.event.pull_request.number }}
+          image: ${{ env.IMAGEN }}:${{ steps.tag.outputs.valor }}
           tag: pr-${{ github.event.pull_request.number }}
           no_traffic: true
 
@@ -120,6 +133,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - id: tag
+        name: Calcular la etiqueta de la imagen (hash del contenido)
+        run: echo "valor=$(cat Dockerfile index.html build.mjs package.json | sha256sum | cut -c1-12)" >> "$GITHUB_OUTPUT"
+
       - id: auth
         name: Autenticarse en Google Cloud
         uses: google-github-actions/auth@v2
@@ -132,18 +149,19 @@ jobs:
       - name: Autenticar Docker con Artifact Registry
         run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
 
-      - name: Construir y subir la imagen
+      - name: Construir y subir la imagen (solo si la vista previa no la construyó ya)
         run: |
-          docker build \
-            --build-arg GITHUB_SHA=${{ github.sha }} \
-            -t ${{ env.IMAGEN }}:${{ github.sha }} \
-            -t ${{ env.IMAGEN }}:latest .
-          docker push ${{ env.IMAGEN }}:${{ github.sha }}
-          docker push ${{ env.IMAGEN }}:latest
+          TAG=${{ steps.tag.outputs.valor }}
+          if gcloud artifacts docker images describe "${{ env.IMAGEN }}:$TAG" --project "${{ env.GCP_PROJECT }}" &>/dev/null; then
+            echo "Ya existe una imagen para este contenido — se promueve tal cual, sin reconstruir."
+          else
+            docker build --build-arg GITHUB_SHA=${{ github.sha }} -t ${{ env.IMAGEN }}:$TAG .
+            docker push ${{ env.IMAGEN }}:$TAG
+          fi
 
       - name: Publicar en el sitio real
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICIO }}
           region: ${{ env.GCP_REGION }}
-          image: ${{ env.IMAGEN }}:${{ github.sha }}
+          image: ${{ env.IMAGEN }}:${{ steps.tag.outputs.valor }}

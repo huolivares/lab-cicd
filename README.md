@@ -28,11 +28,20 @@ Para verla en local: `node build.mjs && open dist/index.html`, o con Docker:
 |---|---|---|
 | **Construir** | `build.mjs` genera `dist/` e inyecta el hash del commit en la esquina de la pantalla — corre dentro de la imagen, en la primera etapa del `Dockerfile` | en cada cambio |
 | **Verificar** | `test/validar.mjs` revisa las slides. Si algo no cumple, termina con error | en cada pull request y push a `main` |
-| **Vista previa** | construye la imagen, la sube a Artifact Registry y despliega una revisión de Cloud Run sin tráfico, con URL propia comentada en el PR | solo en pull requests |
-| **Publicar** | construye la imagen, la sube como `latest` y mueve el 100% del tráfico del servicio de Cloud Run a esa revisión | solo al fusionar en `main` |
+| **Vista previa** | calcula una etiqueta a partir del contenido (no del commit), construye y sube la imagen a Artifact Registry si no existe ya, y despliega una revisión de Cloud Run sin tráfico con URL propia comentada en el PR | solo en pull requests |
+| **Publicar** | calcula la misma etiqueta; si la vista previa ya construyó esa imagen, no la reconstruye — solo la despliega tal cual, byte a byte, con el 100% del tráfico | solo al fusionar en `main` |
 
 El número abajo a la derecha de la presentación es **la versión publicada**.
 Al revertir un cambio, ese número cambia a la vista de todos.
+
+**Por qué la etiqueta de la imagen es un hash y no el commit:** el commit de fusión
+que crea GitHub al aceptar un PR no es el mismo commit que ya construyó `vista-previa`.
+Si `publicar` reconstruyera con ese SHA distinto, `docker build` podría traer una
+versión más nueva de `node:20-alpine` o `nginx:alpine` que la usada en la vista previa
+— lo que se probó dejaría de ser exactamente lo que se publica. Etiquetar por el hash
+del contenido real (`Dockerfile` + `index.html` + `build.mjs` + `package.json`) hace
+que, si nada de eso cambió entre la vista previa y la fusión, `publicar` reconozca que
+la imagen ya existe y la reutilice en vez de reconstruir.
 
 ## Trabajar localmente
 
