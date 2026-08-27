@@ -34,10 +34,10 @@ on:
     branches: [main]
 
 env:
-  GCP_PROJECT: TU_PROYECTO_GCP
+  GCP_PROJECT: houston-lab-ecafd
   GCP_REGION: southamerica-west1
   SERVICIO: lab-cicd
-  IMAGEN: southamerica-west1-docker.pkg.dev/TU_PROYECTO_GCP/lab-cicd/sitio
+  IMAGEN: southamerica-west1-docker.pkg.dev/houston-lab-ecafd/lab-cicd/sitio
 
 jobs:
   verificar:
@@ -93,3 +93,5 @@ jobs:
           service: ${{ env.SERVICIO }}
           region: ${{ env.GCP_REGION }}
           image: ${{ env.IMAGEN }}:${{ github.sha }}
+          # El sitio es público: la presentación se proyecta sin login.
+          flags: '--allow-unauthenticated --port=80'

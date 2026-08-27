@@ -79,12 +79,13 @@ tiene consecuencias, es el momento que mejor transmite el valor de automatizar.
 
 ## Configuración, una sola vez
 
-**Google Cloud** — pendiente, hay que correr esto una vez con `gcloud` autenticado
-como propietario del proyecto. Reemplazar `TU_PROYECTO_GCP` por el ID real del
-proyecto (y actualizar `GCP_PROJECT`/`IMAGEN` en `deploy.yml` con el mismo valor).
+**Google Cloud** — ya hecho sobre el proyecto `houston-lab-ecafd`
+(región `southamerica-west1`). El bloque de abajo queda como referencia de qué
+se creó; para rehacerlo en otro proyecto, reemplazar el valor de `PROYECTO` y
+actualizar `GCP_PROJECT`/`IMAGEN` en `deploy.yml` con el mismo valor.
 
 ```bash
-PROYECTO=TU_PROYECTO_GCP
+PROYECTO=houston-lab-ecafd
 REGION=southamerica-west1
 
 # Habilitar las APIs necesarias
@@ -118,12 +119,12 @@ gcloud iam service-accounts add-iam-policy-binding "$SA" --project "$PROYECTO" \
   --member="principalSet://iam.googleapis.com/projects/$PROYECTO/locations/global/workloadIdentityPools/github/attribute.repository/huolivares/lab-cicd"
 ```
 
-Con eso quedan dos secrets por cargar en `Settings → Secrets and variables →
-Actions`:
+Con eso quedan dos secrets en `Settings → Secrets and variables → Actions`
+(ya cargados):
 
-- `GCP_WORKLOAD_IDENTITY_PROVIDER` — el nombre completo del proveedor que imprime
-  el comando `workload-identity-pools providers describe`.
-- `GCP_SERVICE_ACCOUNT` — el email de la cuenta de servicio (`$SA` arriba).
+- `GCP_WORKLOAD_IDENTITY_PROVIDER` =
+  `projects/130494636669/locations/global/workloadIdentityPools/github/providers/github`
+- `GCP_SERVICE_ACCOUNT` = `lab-cicd-deploy@houston-lab-ecafd.iam.gserviceaccount.com`
 
 **Protección de rama** — `Settings → Branches → Add rule → main`
 
