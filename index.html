@@ -731,14 +731,14 @@ jobs:
  runs-on: ubuntu-latest
  steps:
  - uses: actions/checkout@v4
- - uses: actions/setup-node@v4
- - name: Construir
- run: node build.mjs
+ - uses: google-github-actions/auth@v2
+ - run: docker build -t $IMAGEN:$SHA .
+ &amp;&amp; docker push $IMAGEN:$SHA
  - name: Desplegar
- uses: FirebaseExtended/action-hosting-deploy@v0
+ uses: google-github-actions/deploy-cloudrun@v2
  with:
- firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT... }}
- channelId: live
+ service: lab-cicd
+ image: $IMAGEN:$SHA
  </code></pre>
  <p class="pie-codigo"><code>needs</code> obliga a que la verificación pase primero.
  El <code>if</code> impide publicar desde una propuesta de cambio. Fusionar un pull
@@ -750,16 +750,18 @@ jobs:
  <section>
  <h2 data-kicker="Seguridad">Las credenciales no van en el código</h2>
  <pre data-lang="yaml"><code class="language-yaml" data-trim data-noescape>
- - name: Desplegar
- uses: FirebaseExtended/action-hosting-deploy@v0
+ - name: Autenticarse en Google Cloud
+ uses: google-github-actions/auth@v2
  with:
- firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT... }}
- projectId: ${{ env.FIREBASE_PROJECT }}
- channelId: live
+ workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+ service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
  </code></pre>
  <ul>
  <li>El valor real vive en el repositorio como <strong>secret</strong>, cifrado.</li>
  <li>No aparece en el archivo, ni en el historial, ni en los registros.</li>
+ <li>Acá ni siquiera hay una llave guardada: GitHub y Google Cloud confían uno
+ en el otro directamente (Workload Identity Federation), así que no hay
+ credencial de larga vida que se pueda filtrar.</li>
  </ul>
  </section>
 
