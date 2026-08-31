@@ -1280,13 +1280,13 @@ Settings → Branches → Add rule → main
 
  <section>
  <h2 data-kicker="Bloque 1">Rama de trabajo</h2>
- <p>Cada uno clona el repositorio, crea su rama y completa su propia slide, al
- final de esta presentación.</p>
+ <p>Cada uno clona el repositorio, crea su rama y edita <strong>solo su
+ archivo</strong> en <code>participantes/</code> — no la presentación entera.</p>
  <pre data-lang="bash"><code class="language-bash" data-trim>
 git clone https://github.com/huolivares/lab-cicd.git
 cd lab-cicd
 git checkout -b tu-usuario/practica
-git add index.html
+git add participantes/
 git commit -m "mensaje útil"
 git push -u origin tu-usuario/practica
  </code></pre>
@@ -1294,9 +1294,10 @@ git push -u origin tu-usuario/practica
  cambio, no describe el archivo: la misma regla que ya vimos en la Sesión 1.</p>
  <aside class="notes">
  Circular entre las mesas mientras cada uno clona, crea la rama y hace su
- primer commit. El cambio real es completar su propia tarjeta, al final de la
- presentación: Fanny, Dylan, Gabriel, Richard, Juan y Pablo ya tienen la suya
- con texto de relleno para reemplazar.
+ primer commit. El cambio real es completar su propio archivo en
+ participantes/: Fanny, Dylan, Gabriel, Richard, Juan y Pablo ya tienen el suyo
+ (01-fanny.html … 06-pablo.html) con texto de relleno para reemplazar. El build
+ arma la presentación con esos fragmentos; nadie edita index.html a mano.
  </aside>
  </section>
 
@@ -1331,7 +1332,7 @@ job Verificar: checkout → construir → validar
  <p>Introducimos a propósito un cambio que no pasa la verificación y observamos
  qué hace el sistema.</p>
  <pre data-lang="bash"><code class="language-bash" data-trim>
-git add index.html
+git add participantes/
 git commit -m "prueba de rechazo"
 git push
  </code></pre>
@@ -1339,11 +1340,13 @@ git push
  bloquea la fusión.</p>
  <aside class="notes">
  Acá les muestro los tests (test/validar.mjs) y les digo que hagan fallar uno a
- propósito; no adelantar en la slide cómo se rompe.
+ propósito; no adelantar en la slide cómo se rompe. La forma limpia: el
+ voluntario borra el &lt;/section&gt; o el &lt;h2&gt; de su propio archivo
+ (participantes/NN-nombre.html) y lo sube. El test cae con un mensaje que dice
+ exactamente qué archivo y qué le falta.
  Un solo voluntario, no todo el grupo: el objetivo es ver al sistema decir que
- no, sin llenar el repositorio de pull requests rotos. El voluntario hace el
- cambio en su propia slide y lo sube; el resto observa. Se hace sobre el mismo
- PR que ya abrieron en el bloque 2, con un commit nuevo.
+ no, sin llenar el repositorio de pull requests rotos. El resto observa. Se hace
+ sobre el mismo PR que ya abrieron en el bloque 2, con un commit nuevo.
  </aside>
  </section>
 
@@ -1351,7 +1354,7 @@ git push
  <h2 data-kicker="Bloque 4">Diagnóstico y corrección</h2>
  <p>Leemos el log del paso que falló, encontramos la causa y la corregimos.</p>
  <pre data-lang="bash"><code class="language-bash" data-trim>
-git add index.html
+git add participantes/
 git commit -m "corrige el rechazo"
 git push
  </code></pre>
@@ -1423,41 +1426,10 @@ git push
 
  <!-- ═══════════ TARJETAS DE LOS PARTICIPANTES ═══════════ -->
 
- <section>
- <h2 data-kicker="Es tu turno">Fanny</h2>
- <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
- <p class="nota">Algo entretenido de mí: completar acá.</p>
- </section>
-
- <section>
- <h2 data-kicker="Es tu turno">Dylan</h2>
- <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
- <p class="nota">Algo entretenido de mí: completar acá.</p>
- </section>
-
- <section>
- <h2 data-kicker="Es tu turno">Gabriel</h2>
- <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
- <p class="nota">Algo entretenido de mí: completar acá.</p>
- </section>
-
- <section>
- <h2 data-kicker="Es tu turno">Richard</h2>
- <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
- <p class="nota">Algo entretenido de mí: completar acá.</p>
- </section>
-
- <section>
- <h2 data-kicker="Es tu turno">Juan</h2>
- <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
- <p class="nota">Algo entretenido de mí: completar acá.</p>
- </section>
-
- <section>
- <h2 data-kicker="Es tu turno">Pablo</h2>
- <p>Acá va mi info: a qué me dedico y hace cuánto ando en esto.</p>
- <p class="nota">Algo entretenido de mí: completar acá.</p>
- </section>
+ <!-- PARTICIPANTES -->
+ <!-- build.mjs reemplaza la línea de arriba con los fragmentos de
+      participantes/, ordenados por nombre de archivo. Cada persona edita
+      solo su archivo. -->
 
  </div>
  </div>
