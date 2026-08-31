@@ -3,19 +3,19 @@
  * =========================================================
  * Dos niveles de chequeo:
  *
- *   1. Cada fragmento de participantes/ por separado: que exista, que sea UN
- *      <section> con UN <h2>, y que sus etiquetas estén bien cerradas. Estos
- *      chequeos son ESTRUCTURALES a propósito: NO miran el texto ("completar
- *      acá" es válido), solo la forma. Así `main` nace en verde y el pipeline
- *      arranca sano.
+ *   1. Cada fragmento de participantes/ por separado: que exista, que sea UNA
+ *      tarjeta <div class="participante"> con UN <h3>, y que sus etiquetas
+ *      estén bien cerradas. Estos chequeos son ESTRUCTURALES a propósito: NO
+ *      miran el texto ("completar acá" es válido), solo la forma. Así `main`
+ *      nace en verde y el pipeline arranca sano.
  *
  *   2. La presentación ya ensamblada (plantilla + fragmentos): reglas
  *      DELIBERADAMENTE frágiles sobre las slides.
  *
  * El objetivo didáctico es el "rechazo controlado": un participante borra el
- * </section> o el <h2> de SU archivo, el test cae, y el log dice exactamente
- * qué archivo y qué le falta. El equipo ve al sistema decir que no, en un
- * entorno donde equivocarse no tiene consecuencias.
+ * </div> o el <h3> de SU archivo, el test cae, y el log dice exactamente qué
+ * archivo y qué le falta. El equipo ve al sistema decir que no, en un entorno
+ * donde equivocarse no tiene consecuencias.
  *
  * No endurecer estas reglas. Si algo no falla nunca, no enseña nada.
  *
@@ -65,23 +65,23 @@ revisar(
 );
 
 for (const f of fragmentos) {
-  const abreSection = (f.html.match(/<section\b/g) || []).length;
-  const cierraSection = (f.html.match(/<\/section>/g) || []).length;
-  const h2 = (f.html.match(/<h2\b/g) || []).length;
-  const cierraH2 = (f.html.match(/<\/h2>/g) || []).length;
+  const abreDiv = (f.html.match(/<div\b/g) || []).length;
+  const cierraDiv = (f.html.match(/<\/div>/g) || []).length;
+  const h3 = (f.html.match(/<h3\b/g) || []).length;
+  const cierraH3 = (f.html.match(/<\/h3>/g) || []).length;
   const sueltas = desbalance(f.html);
 
   let mensaje = null;
-  if (abreSection !== 1 || cierraSection !== 1) {
-    mensaje = `debe ser exactamente un <section>…</section> ` +
-      `(encontrado: ${abreSection} de apertura, ${cierraSection} de cierre)`;
-  } else if (!f.html.startsWith('<section')) {
-    mensaje = 'el fragmento tiene que empezar con <section>';
-  } else if (!f.html.endsWith('</section>')) {
-    mensaje = 'falta el </section> de cierre al final del archivo';
-  } else if (h2 !== 1 || cierraH2 !== 1) {
-    mensaje = `debe tener exactamente un <h2>…</h2> ` +
-      `(encontrado: ${h2} de apertura, ${cierraH2} de cierre)`;
+  if (!/^<div\b[^>]*\bclass="[^"]*\bparticipante\b/.test(f.html)) {
+    mensaje = 'el fragmento tiene que empezar con <div class="participante">';
+  } else if (!f.html.endsWith('</div>')) {
+    mensaje = 'falta el </div> de cierre al final del archivo';
+  } else if (abreDiv !== cierraDiv) {
+    mensaje = `los <div> no están balanceados ` +
+      `(${abreDiv} de apertura, ${cierraDiv} de cierre)`;
+  } else if (h3 !== 1 || cierraH3 !== 1) {
+    mensaje = `debe tener exactamente un <h3>…</h3> con el nombre ` +
+      `(encontrado: ${h3} de apertura, ${cierraH3} de cierre)`;
   } else if (sueltas.length) {
     mensaje = `etiquetas sin cerrar o cerradas de más: ${sueltas.join(', ')}`;
   }

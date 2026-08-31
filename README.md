@@ -74,12 +74,12 @@ Están en `test/validar.mjs` y son **deliberadamente frágiles**. Primero revisa
 cada fragmento de `participantes/` por separado:
 
 1. El directorio tiene al menos un fragmento.
-2. Cada fragmento es exactamente un `<section>…</section>`.
-3. Cada fragmento tiene exactamente un `<h2>…</h2>`.
+2. Cada fragmento es una tarjeta `<div class="participante">…</div>`.
+3. Cada fragmento tiene exactamente un `<h3>…</h3>` (el nombre).
 4. Las etiquetas del fragmento están bien cerradas.
 
 Son chequeos **estructurales**: no miran el texto, así que "completar acá" es
-válido y `main` nace en verde. Si alguien borra el `</section>` o el `<h2>` de su
+válido y `main` nace en verde. Si alguien borra el `</div>` o el `<h3>` de su
 archivo, el log dice exactamente qué archivo y qué le falta.
 
 Después revisa la presentación ya ensamblada:

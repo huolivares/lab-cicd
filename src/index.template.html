@@ -108,6 +108,20 @@ html,body{background:var(--fondo)}
 .reveal .progress{height:4px;top:0;bottom:auto;background:rgba(14,26,43,.1)}
 .reveal .progress span{background:var(--ambar)}
 .reveal .controls{display:none}
+/* Slide "Quiénes están hoy acá": tarjetas de participantes, tipo pizarra */
+.mural{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:1em 1.4em;margin-top:.3em}
+.reveal .participante{
+  margin:0;background:var(--blanco);border:1.5px solid var(--tinta);border-left:4px solid var(--ambar);
+  border-radius:var(--radius-sm);box-shadow:5px 5px 0 var(--ambar);padding:.7em .95em;width:300px;
+}
+.reveal .participante h3{font-size:.82em;margin:0 0 .2em;font-weight:800}
+.reveal .participante p{font-size:.58em;line-height:1.34;margin:0}
+.participante:nth-child(3n+1){transform:rotate(-2.4deg)}
+.participante:nth-child(3n+2){transform:rotate(2deg);margin-top:1.3em}
+.participante:nth-child(3n){transform:rotate(-1deg)}
+.participante:nth-child(4n){margin-top:.8em}
+.participante:nth-child(even){margin-left:.9em}
+.participante:nth-child(5n+3){margin-top:.5em}
 @media(max-width:1000px){.reveal{font-size:28px}.reveal .slides section{padding:40px 44px}}
 </style>
 
@@ -1296,8 +1310,9 @@ git push -u origin tu-usuario/practica
  Circular entre las mesas mientras cada uno clona, crea la rama y hace su
  primer commit. El cambio real es completar su propio archivo en
  participantes/: Fanny, Dylan, Gabriel, Richard, Juan y Pablo ya tienen el suyo
- (01-fanny.html … 06-pablo.html) con texto de relleno para reemplazar. El build
- arma la presentación con esos fragmentos; nadie edita index.html a mano.
+ (01-fanny.html … 06-pablo.html) con texto de relleno para reemplazar. Cada
+ archivo es una tarjeta; el build las junta en la slide "Quiénes están hoy acá".
+ Nadie edita la presentación ensamblada a mano.
  </aside>
  </section>
 
@@ -1341,7 +1356,7 @@ git push
  <aside class="notes">
  Acá les muestro los tests (test/validar.mjs) y les digo que hagan fallar uno a
  propósito; no adelantar en la slide cómo se rompe. La forma limpia: el
- voluntario borra el &lt;/section&gt; o el &lt;h2&gt; de su propio archivo
+ voluntario borra el &lt;/div&gt; o el &lt;h3&gt; de su propia tarjeta
  (participantes/NN-nombre.html) y lo sube. El test cae con un mensaje que dice
  exactamente qué archivo y qué le falta.
  Un solo voluntario, no todo el grupo: el objetivo es ver al sistema decir que
@@ -1424,12 +1439,22 @@ git push
  </aside>
  </section>
 
- <!-- ═══════════ TARJETAS DE LOS PARTICIPANTES ═══════════ -->
+ <!-- ═══════════ PARTICIPANTES ═══════════ -->
 
+ <section>
+ <h2 data-kicker="Es tu turno">Quiénes están hoy acá</h2>
+ <div class="mural">
  <!-- PARTICIPANTES -->
- <!-- build.mjs reemplaza la línea de arriba con los fragmentos de
+ <!-- build.mjs reemplaza la línea de arriba por los fragmentos de
       participantes/, ordenados por nombre de archivo. Cada persona edita
-      solo su archivo. -->
+      solo su archivo; el build arma esta slide con todos. -->
+ </div>
+ <aside class="notes">
+ Una tarjeta por persona, en desorden a propósito. Cada uno completó su propio
+ archivo (participantes/01-fanny.html … 06-pablo.html) en el Bloque 1; esta
+ slide es el resultado de juntarlos. Dar una vuelta rápida presentándose.
+ </aside>
+ </section>
 
  </div>
  </div>
