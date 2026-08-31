@@ -1264,7 +1264,7 @@ Settings → Branches → Add rule → main
  <li>Revisión entre pares</li>
  <li>Fusión, despliegue y reversión</li>
  </ol>
- <p class="nota">Todos ejecutan, en paralelo, sobre su propia rama.</p>
+ <p class="nota">Cada uno trabaja en paralelo, sobre su propia rama.</p>
  </section>
 
  <section>
@@ -1274,14 +1274,14 @@ Settings → Branches → Add rule → main
  <li><strong>Git</strong> instalado en el computador con el que van a trabajar.</li>
  <li>URL del repositorio: <code>github.com/huolivares/lab-cicd</code></li>
  </ul>
- <p class="nota">Si a alguien le falta algo de esto, es el momento de resolverlo: el
- resto del laboratorio asume que ya están listos.</p>
+ <p class="nota">Si falta algo de esto, es buen momento para resolverlo: el resto del
+ laboratorio da por hecho que ya está listo.</p>
  </section>
 
  <section>
  <h2 data-kicker="Bloque 1">Rama de trabajo</h2>
- <p>Clonen el repositorio, creen su rama y completen su propia slide, al
- final de este deck.</p>
+ <p>Cada uno clona el repositorio, crea su rama y completa su propia slide, al
+ final de esta presentación.</p>
  <pre data-lang="bash"><code class="language-bash" data-trim>
 git clone https://github.com/huolivares/lab-cicd.git
 cd lab-cicd
@@ -1294,15 +1294,15 @@ git push -u origin tu-usuario/practica
  cambio, no describe el archivo: la misma regla que ya vimos en la Sesión 1.</p>
  <aside class="notes">
  Circular entre las mesas mientras cada uno clona, crea la rama y hace su
- primer commit. El cambio real es completar su propia tarjeta, al final del
- deck: Fanny, Dylan, Gabriel, Richard, Juan y Pablo ya tienen la suya con texto
- de relleno para reemplazar.
+ primer commit. El cambio real es completar su propia tarjeta, al final de la
+ presentación: Fanny, Dylan, Gabriel, Richard, Juan y Pablo ya tienen la suya
+ con texto de relleno para reemplazar.
  </aside>
  </section>
 
  <section>
  <h2 data-kicker="Bloque 2">Primer pull request</h2>
- <p>Abran la propuesta de cambio en GitHub y lean el diff antes de crearla.</p>
+ <p>Cada uno abre su propuesta de cambio en GitHub y revisa el diff antes de crearla.</p>
  <pre data-lang="github"><code class="language-text" data-trim>
 GitHub → Pull requests → New pull request
 base: main   ←   compare: tu-usuario/practica
@@ -1314,13 +1314,11 @@ Revisar el diff → Create pull request
 
  <section>
  <h2 data-kicker="Bloque 3">Verificación automática</h2>
- <p>Abran la pestaña Checks de su pull request y sigan el job Verificar en vivo.</p>
+ <p>En la pestaña Checks del pull request seguimos el job Verificar en vivo.</p>
  <pre data-lang="github"><code class="language-text" data-trim>
 Pull request → pestaña Checks
 job Verificar: checkout → construir → validar
  </code></pre>
- <p class="pie-codigo">Los mismos dos comandos corren en su máquina con
- <code>npm run verificar</code>: <code>build.mjs</code> y <code>test/validar.mjs</code>.</p>
  <aside class="notes">
  Apenas se abre el pull request, el pipeline construye y prueba el cambio, en
  vivo y a la vista de todos. Ir señalando cada paso del job mientras corre:
@@ -1330,45 +1328,48 @@ job Verificar: checkout → construir → validar
 
  <section>
  <h2 data-kicker="Bloque 4">Rechazo controlado</h2>
- <p>Un voluntario borra el <code>&lt;h2&gt;</code> de su propia slide y sube
- el cambio. El resto observa.</p>
+ <p>Introducimos a propósito un cambio que no pasa la verificación y observamos
+ qué hace el sistema.</p>
  <pre data-lang="bash"><code class="language-bash" data-trim>
 git add index.html
 git commit -m "prueba de rechazo"
 git push
  </code></pre>
  <p class="pie-codigo">El job <strong>Verificar</strong> se pone en rojo y GitHub
- bloquea la fusión: es la regla "todas las slides tienen título" de
- <code>test/validar.mjs</code>.</p>
+ bloquea la fusión.</p>
  <aside class="notes">
+ Acá les muestro los tests (test/validar.mjs) y les digo que hagan fallar uno a
+ propósito; no adelantar en la slide cómo se rompe.
  Un solo voluntario, no todo el grupo: el objetivo es ver al sistema decir que
- no, sin llenar el repositorio de pull requests rotos. Se hace sobre el mismo
+ no, sin llenar el repositorio de pull requests rotos. El voluntario hace el
+ cambio en su propia slide y lo sube; el resto observa. Se hace sobre el mismo
  PR que ya abrieron en el bloque 2, con un commit nuevo.
  </aside>
  </section>
 
  <section>
  <h2 data-kicker="Bloque 4">Diagnóstico y corrección</h2>
- <p>El mismo voluntario proyecta su pantalla, lee el log del paso que falló y corrige.</p>
+ <p>Leemos el log del paso que falló, encontramos la causa y la corregimos.</p>
  <pre data-lang="bash"><code class="language-bash" data-trim>
 git add index.html
 git commit -m "corrige el rechazo"
 git push
  </code></pre>
- <p class="pie-codigo">Antes: en la pestaña Checks, abrir <strong>Verificar</strong> y
- leer qué línea del log dice el error, y devolver el <code>&lt;h2&gt;</code> a
- la slide. El pipeline vuelve a correr solo, sin que nadie lo dispare a mano.</p>
+ <p class="pie-codigo">En la pestaña Checks, el log de <strong>Verificar</strong> dice
+ qué línea causó el error. Con el arreglo subido, el pipeline vuelve a correr
+ solo, sin que nadie lo dispare a mano.</p>
  <aside class="notes">
- Que proyecte quien rompió el pipeline: es su error y su diagnóstico, y así el
- grupo lo ve una vez completo en vez de repetirlo cinco veces. Si nadie puede
- compartir pantalla, lo conduce el relator.
+ El mismo voluntario proyecta su pantalla, lee el log del paso que falló y
+ corrige: es su error y su diagnóstico, y así el grupo lo ve una vez completo en
+ vez de repetirlo cinco veces. Si nadie puede compartir pantalla, lo conduce el
+ relator.
  </aside>
  </section>
 
  <section>
  <h2 data-kicker="Bloque 5">Revisión entre pares</h2>
- <p>Uno de ustedes proyecta y revisa el pull request de un compañero: comenta
- líneas específicas del diff.</p>
+ <p>Revisamos el pull request de un compañero y comentamos líneas específicas
+ del diff.</p>
  <pre data-lang="github"><code class="language-text" data-trim>
 Pull requests → PR de un compañero → Files changed
 pasar el mouse sobre una línea → "+" → comentar
@@ -1384,7 +1385,7 @@ Review changes → Comment
 
  <section>
  <h2 data-kicker="Bloque 6">Fusión y despliegue</h2>
- <p>Fusionen su pull request y abran la pestaña Actions.</p>
+ <p>Fusionamos el pull request y abrimos la pestaña Actions.</p>
  <pre data-lang="github"><code class="language-text" data-trim>
 Pull request → Merge pull request
 Actions → job publicar → Publicar en el sitio real
@@ -1403,7 +1404,7 @@ Actions → job publicar → Publicar en el sitio real
 
  <section>
  <h2 data-kicker="Bloque 6">Reversión</h2>
- <p>Reviertan su propio commit y publiquen de nuevo.</p>
+ <p>Revertimos el commit y publicamos de nuevo.</p>
  <pre data-lang="bash"><code class="language-bash" data-trim>
 git log --oneline
 git revert &lt;hash&gt;
