@@ -17,9 +17,12 @@ FROM node:20-alpine AS build
 WORKDIR /app
 ARG GITHUB_SHA=local
 ENV GITHUB_SHA=$GITHUB_SHA
-COPY package.json build.mjs index.html ./
+COPY package.json build.mjs ./
+COPY src ./src
+COPY participantes ./participantes
 RUN node build.mjs
 
 FROM nginx:alpine
+# Sirve el resultado del build (dist/), nunca la plantilla ni los fragmentos.
 COPY --from=build /app/dist /usr/share/nginx/html
 EXPOSE 80

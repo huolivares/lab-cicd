@@ -13,6 +13,12 @@ despliegue (`gcloud run services describe lab-cicd --region southamerica-west1
 Para verla en local: `node build.mjs && open dist/index.html`, o con Docker:
 `docker compose up --build` y abrir `http://localhost:8080`.
 
+La presentación se **ensambla** en el build: la plantilla vive en
+`src/index.template.html` y cada participante tiene su propio fragmento en
+`participantes/` (`01-fanny.html`, `02-dylan.html`, …). `build.mjs` descubre esos
+archivos por directorio, los ordena por nombre y los inserta en la plantilla. No
+hay un `index.html` suelto ni una lista de nombres que todos tengan que tocar.
+
 ---
 
 ## Cómo funciona
@@ -25,7 +31,7 @@ Para verla en local: `node build.mjs && open dist/index.html`, o con Docker:
 
 | Etapa | Qué hace | Cuándo corre |
 |---|---|---|
-| **Construir** | `build.mjs` genera `dist/` e inyecta el hash del commit en la esquina de la pantalla — corre dentro de la imagen, en la primera etapa del `Dockerfile` | en cada cambio |
+| **Construir** | `build.mjs` ensambla `src/index.template.html` con los fragmentos de `participantes/`, genera `dist/` e inyecta el hash del commit en la esquina de la pantalla — corre dentro de la imagen, en la primera etapa del `Dockerfile` | en cada cambio |
 | **Verificar** | `test/validar.mjs` revisa las slides. Si algo no cumple, termina con error | en cada pull request y push a `main` |
 | **Publicar** | construye la imagen, la etiqueta con el hash del commit, la sube a Artifact Registry y mueve el 100% del tráfico del servicio de Cloud Run a esa revisión | solo al fusionar en `main` |
 
@@ -44,15 +50,15 @@ alguien alcanzó a revisar.
 ## Trabajar localmente
 
 ```bash
-npm run verificar     # construye y valida
-open dist/index.html  # o abrir index.html directo
+npm run verificar     # ensambla, construye y valida
+open dist/index.html  # el resultado del build
 ```
 
 No hay dependencias que instalar: reveal.js se carga desde CDN y la validación usa
 Node a secas.
 
-Para probar el artefacto real (la imagen que termina en Cloud Run), en vez del
-`index.html` suelto:
+Para probar el artefacto real (la imagen que termina en Cloud Run), en vez de
+abrir `dist/` directo:
 
 ```bash
 docker compose up --build   # http://localhost:8080
@@ -64,14 +70,24 @@ es exactamente lo que construye y publica `deploy.yml`.
 
 ## Las reglas de validación
 
-Están en `test/validar.mjs` y son **deliberadamente frágiles**:
+Están en `test/validar.mjs` y son **deliberadamente frágiles**. Primero revisa
+cada fragmento de `participantes/` por separado:
 
-1. Hay al menos una slide.
-2. Cada slide tiene título — la portada `<h1>`, las demás `<h2>`.
-3. No quedan marcas `TODO`, `FIXME` ni `XXX`.
-4. Ninguna slide pasa de 700 caracteres de texto.
-5. El marcador de versión sigue en su lugar.
-6. Las etiquetas `<section>` están balanceadas.
+1. El directorio tiene al menos un fragmento.
+2. Cada fragmento es una tarjeta `<div class="participante">…</div>`.
+3. Cada fragmento tiene exactamente un `<h3>…</h3>` (el nombre).
+4. Las etiquetas del fragmento están bien cerradas.
+
+Son chequeos **estructurales**: no miran el texto, así que "completar acá" es
+válido y `main` nace en verde. Si alguien borra el `</div>` o el `<h3>` de su
+archivo, el log dice exactamente qué archivo y qué le falta.
+
+Después revisa la presentación ya ensamblada:
+
+5. Hay al menos una slide y cada una tiene título — la portada `<h1>`, las demás `<h2>`.
+6. No quedan marcas `TODO`, `FIXME` ni `XXX`.
+7. Ninguna slide pasa de 700 caracteres de texto ni de 7 viñetas.
+8. El marcador de versión sigue en su lugar y las `<section>` están balanceadas.
 
 Son frágiles a propósito: el ejercicio de **rechazo controlado** necesita que sea
 fácil equivocarse. Ver al pipeline decir que no, en un entorno donde equivocarse no
