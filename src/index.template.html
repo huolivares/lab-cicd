@@ -109,19 +109,24 @@ html,body{background:var(--fondo)}
 .reveal .progress span{background:var(--ambar)}
 .reveal .controls{display:none}
 /* Slide "Quiénes están hoy acá": tarjetas de participantes, tipo pizarra */
-.mural{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:1em 1.4em;margin-top:.3em}
+.reveal .slides section.participantes{display:flex!important;flex-direction:column;justify-content:center}
+.reveal .slides section.participantes h2{flex:0 0 auto}
+.mural{
+  display:flex;flex-wrap:wrap;justify-content:center;align-content:center;align-items:flex-start;
+  gap:.85em 1.1em;max-width:1120px;margin:.15em auto 0;
+}
 .reveal .participante{
   margin:0;background:var(--blanco);border:1.5px solid var(--tinta);border-left:4px solid var(--ambar);
-  border-radius:var(--radius-sm);box-shadow:5px 5px 0 var(--ambar);padding:.7em .95em;width:300px;
+  border-radius:var(--radius-sm);box-shadow:5px 5px 0 var(--ambar);padding:.55em .9em;
+  width:340px;flex:0 0 auto;
 }
-.reveal .participante h3{font-size:.82em;margin:0 0 .2em;font-weight:800}
-.reveal .participante p{font-size:.58em;line-height:1.34;margin:0}
-.participante:nth-child(3n+1){transform:rotate(-2.4deg)}
-.participante:nth-child(3n+2){transform:rotate(2deg);margin-top:1.3em}
-.participante:nth-child(3n){transform:rotate(-1deg)}
-.participante:nth-child(4n){margin-top:.8em}
-.participante:nth-child(even){margin-left:.9em}
-.participante:nth-child(5n+3){margin-top:.5em}
+.reveal .participante h3{font-size:.78em;margin:0 0 .12em;font-weight:800}
+.reveal .participante p{font-size:.55em;line-height:1.3;margin:0}
+/* Desorden solo con transform: no altera el ancho de caja, así el wrap es parejo */
+.participante:nth-child(3n+1){transform:rotate(-1.7deg) translateY(6px)}
+.participante:nth-child(3n+2){transform:rotate(1.5deg) translateY(-5px)}
+.participante:nth-child(3n){transform:rotate(-.6deg) translateY(9px)}
+.participante:nth-child(4n){transform:rotate(1.1deg) translateY(3px)}
 @media(max-width:1000px){.reveal{font-size:28px}.reveal .slides section{padding:40px 44px}}
 </style>
 
@@ -1309,8 +1314,8 @@ git push -u origin tu-usuario/practica
  <aside class="notes">
  Circular entre las mesas mientras cada uno clona, crea la rama y hace su
  primer commit. El cambio real es completar su propio archivo en
- participantes/: Fanny, Dylan, Gabriel, Richard, Juan y Pablo ya tienen el suyo
- (01-fanny.html … 06-pablo.html) con texto de relleno para reemplazar. Cada
+ participantes/: cada uno ya tiene el suyo (01-fanny.html … 07-hugo.html) con
+ texto de relleno para reemplazar. Cada
  archivo es una tarjeta; el build las junta en la slide "Quiénes están hoy acá".
  Nadie edita la presentación ensamblada a mano.
  </aside>
@@ -1441,7 +1446,7 @@ git push
 
  <!-- ═══════════ PARTICIPANTES ═══════════ -->
 
- <section>
+ <section class="participantes">
  <h2 data-kicker="Es tu turno">Quiénes están hoy acá</h2>
  <div class="mural">
  <!-- PARTICIPANTES -->
@@ -1451,7 +1456,7 @@ git push
  </div>
  <aside class="notes">
  Una tarjeta por persona, en desorden a propósito. Cada uno completó su propio
- archivo (participantes/01-fanny.html … 06-pablo.html) en el Bloque 1; esta
+ archivo (participantes/01-fanny.html … 07-hugo.html) en el Bloque 1; esta
  slide es el resultado de juntarlos. Dar una vuelta rápida presentándose.
  </aside>
  </section>
