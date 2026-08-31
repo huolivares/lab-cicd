@@ -18,7 +18,6 @@ La presentación se **ensambla** en el build: la plantilla vive en
 `participantes/` (`01-fanny.html`, `02-dylan.html`, …). `build.mjs` descubre esos
 archivos por directorio, los ordena por nombre y los inserta en la plantilla. No
 hay un `index.html` suelto ni una lista de nombres que todos tengan que tocar.
-
 ---
 
 ## Cómo funciona
