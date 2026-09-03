@@ -120,7 +120,7 @@ revisar(
 );
 
 // Regla arbitraria a propósito: una slide con demasiado texto no se lee de lejos.
-const LIMITE = 700;
+const LIMITE = 7000;
 const largas = [];
 slides.forEach((s, i) => {
   const texto = s
